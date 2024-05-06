@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from datetime import time
 
-from src.core.models import User
-
 
 @dataclass
 class WeatherDTO:
@@ -10,5 +8,5 @@ class WeatherDTO:
     temperature: float
     feels_like: float
     humidity: int
-    weather: list[str]
+    weather_type: list[str]
     wind: float

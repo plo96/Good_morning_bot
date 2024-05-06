@@ -1,23 +1,51 @@
-import requests as req
+import httpx
 
-OPENWEATHERMAP_API_KEY = ''
-city = 'Kyrlyk'
-GEOPOSITION_URL = f'http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=10&appid={OPENWEATHERMAP_API_KEY}'
-
-response = req.get(url=GEOPOSITION_URL)
-
-result = response.json()
-
-# print(result)
-# print(type(result))
-for city in result:
-    print(city)
-
-    # {'name': 'Ust-Kan', 'local_names': {'de': 'Ust-Kan', 'en': 'Ust-Kan', 'ja': 'ウスチ=カン', 'ascii': 'Ust-Kan',
-    #                                     'feature_name': 'Ust-Kan', 'ru': 'Усть-Кан'}, 'lat': 50.932003,
-    #  'lon': 84.765213, 'country': 'RU', 'state': 'Altai Republic'}
-    # {'name': 'Кононовский сельсовет', 'local_names': {'ru': 'Усть-Кан', 'en': 'Ust-Kan'}, 'lat': 56.5133832,
-    #  'lon': 93.8010254, 'country': 'RU', 'state': 'Krasnoyarsk Krai'}
+from src.project.config import settings
+from src.project.exceptions import GeopositionalApiError
+from src.core.schemas import CityDTO
 
 
-    # {'name': 'Kyrlyk', 'local_names': {'ru': 'Кырлык', 'en': 'Kyrlyk'}, 'lat': 50.8055937, 'lon': 84.9462522, 'country': 'RU', 'state': 'Altai Republic'}
+OPENWEATHERMAP_URL = "http://api.openweathermap.org/data/2.5/forecast"
+
+
+class GeopositionWorker:
+    def __init__(
+            self,
+            url: str,
+            token: str,
+    ):
+        self._url = url
+        self._token = token
+    
+    async def get_list_of_cities(
+            self,
+            city_name: str,
+    ) -> list[CityDTO]:
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                url=self._url,
+                params={
+                    "city": city_name,
+                    "appid": self._token,
+                }
+            )
+        
+        response = response.json()
+        
+        if not response or not isinstance(response, list):
+            raise GeopositionalApiError
+        
+        list_of_cities: list = []
+        
+        for result in response:
+            city = CityDTO.from_dict(result)
+            list_of_cities.append(city)
+        
+        return list_of_cities
+
+
+geoposition_worker = GeopositionWorker(
+    url=OPENWEATHERMAP_URL,
+    token=settings.weather_token,
+)

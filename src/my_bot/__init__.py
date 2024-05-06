@@ -1,5 +1,5 @@
 __all__ = (
-	"my_bot",
+	"init_bot",
 )
 
-from telebot import my_bot
+from telegram_bot import init_bot
