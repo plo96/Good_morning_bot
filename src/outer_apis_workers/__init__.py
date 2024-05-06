@@ -1,7 +1,7 @@
 __all__ = (
-	"llm_worker",
+	"gpt_worker",
 	"weather_worker",
 )
 
-from .llm_worker import llm_worker
+from .gpt_worker import gpt_worker
 from .weather_worker import weather_worker

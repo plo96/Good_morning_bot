@@ -2,6 +2,10 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 HOME_DIR = Path(__file__).parent.parent.parent.absolute()
 
 
@@ -9,7 +13,8 @@ HOME_DIR = Path(__file__).parent.parent.parent.absolute()
 class Settings:
 	bot_token: str
 	weather_token: str
-	llm_token: str
+	gpt_token: str
+	gpt_identification: str
 	home_dir: Path
 	db_echo: bool
 	
@@ -21,8 +26,10 @@ class Settings:
 
 settings = Settings(
 	bot_token=os.getenv("BOT_TOKEN"),
-	weather_token=os.getenv("WEATHER_TOKEN"),
-	llm_token=os.getenv("LLM_TOKEN"),
+	weather_token=os.getenv("OPENWEATHERMAP_API_KEY"),
+	gpt_identification=os.getenv("YANDEX_GPT_IDENTIFICATION"),
+	gpt_token=os.getenv("YANDEX_GPT_API_KEY"),
 	home_dir=HOME_DIR,
 	db_echo=False,
 )
+
