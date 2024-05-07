@@ -17,6 +17,7 @@ class Settings:
 	gpt_identification: str
 	home_dir: Path
 	db_echo: bool
+	admin_id: int
 	
 	def __post_init__(self):
 		self.db_url_sqlite_async: str = f"sqlite+aiosqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
@@ -31,5 +32,5 @@ settings = Settings(
 	gpt_token=os.getenv("YANDEX_GPT_API_KEY"),
 	home_dir=HOME_DIR,
 	db_echo=False,
+	admin_id=int(os.getenv('ADMIN_ID')),
 )
-

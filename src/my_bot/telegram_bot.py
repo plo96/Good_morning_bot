@@ -5,11 +5,31 @@ from src.project.config import settings
 from handlers import router
 
 
+async def start_bot(bot: Bot):
+	await bot.send_message(
+		settings.admin_id,
+		text='Bot started.'
+	)
+
+
+async def stop_bot(bot: Bot):
+	await bot.send_message(
+		settings.admin_id,
+		text='Bot stopped.'
+	)
+
+
 async def init_bot():
 	bot = Bot(token=settings.bot_token)
-	await bot.delete_webhook(drop_pending_updates=True)
-	
 	dp = Dispatcher(storage=MemoryStorage())
 	dp.include_router(router)
 	
-	await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+	dp.startup.register(start_bot)
+	dp.shutdown.register(stop_bot)
+	
+	try:
+		await bot.delete_webhook(drop_pending_updates=True)
+		await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+	finally:
+		await bot.session.close()
+		
