@@ -14,7 +14,7 @@ class CityDTO:
 		new_dict: dict = {}
 		for attr, needed_type in cls.__annotations__.items():
 			dict_value = some_dict.__getitem__(attr)
-			if type(dict_value) != needed_type:
+			if isinstance(dict_value, needed_type):
 				raise TypeError(f'Input dict with key "{attr}" is {dict_value}, expected {needed_type}')
 			else:
 				new_dict.__setitem__(attr, dict_value)

@@ -1,4 +1,4 @@
-import httpx
+import aiohttp
 
 from src.project.config import settings
 from src.project.exceptions import GeopositionalApiError
@@ -22,26 +22,22 @@ class GeopositionWorker:
             city_name: str,
     ) -> list[CityDTO]:
         
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        async with aiohttp.ClientSession() as client:
+            async with client.get(
                 url=self._url,
                 params={
                     "city": city_name,
                     "appid": self._token,
                 }
-            )
-        
-        response = response.json()
-        
-        if not response or not isinstance(response, list):
-            raise GeopositionalApiError
-        
-        list_of_cities: list = []
-        
-        for result in response:
-            city = CityDTO.from_dict(result)
-            list_of_cities.append(city)
-        
+            ) as response:
+                response = await response.json()
+                if not response or not isinstance(response, list):
+                    raise GeopositionalApiError
+
+                list_of_cities: list = []
+                for result in response:
+                    city = CityDTO.from_dict(result)
+                    list_of_cities.append(city)
         return list_of_cities
 
 

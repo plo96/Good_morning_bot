@@ -30,4 +30,18 @@ async def echo_message(message: Message):
 	else:
 		...
 		user = await UserRepository.add_user(new_user_dict=...)
-	
+
+
+@router.message(Command("config"))
+async def echo_message(message: Message):
+	user_id = message.from_user.id
+	user = await UserRepository.select_user(user_id=user_id)
+	if user:
+		await message.answer(
+			text=BotTexts.config_already_exists()
+		)
+	else:
+		...
+		user = await UserRepository.add_user(new_user_dict=...)
+
+
