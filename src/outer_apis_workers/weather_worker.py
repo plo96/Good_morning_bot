@@ -22,7 +22,7 @@ class WeatherWorker:
             self,
             lat: float,
             lon: float,
-    ) -> list:
+    ) -> list[WeatherDTO]:
         
         async with aiohttp.ClientSession() as client:
             async with client.get(
@@ -37,8 +37,8 @@ class WeatherWorker:
                 for one_weather_predict in (await response.json())['list'][0:4]:
                     weather = WeatherDTO(
                         time=datetime.fromtimestamp(one_weather_predict['dt']).time(),
-                        temperature=one_weather_predict['main']['temp'],
-                        feels_like=one_weather_predict['main']['feels_like'],
+                        temperature=one_weather_predict['main']['temp'] - 273.15,
+                        feels_like=one_weather_predict['main']['feels_like'] - 273.15,
                         humidity=one_weather_predict['main']['humidity'],
                         weather_type=[weather['main'] for weather in one_weather_predict['weather']],
                         wind=one_weather_predict['wind']['speed'],

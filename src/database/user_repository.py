@@ -10,15 +10,13 @@ session_factory: async_sessionmaker = db_helper.get_session_factory()
 class UserRepository:
     @staticmethod
     async def add_user(
-            new_user_dict: dict,
-    ) -> User:
+            new_user: User,
+    ) -> None:
         async with session_factory() as session:
-            new_user = User(**new_user_dict)
             session.add(new_user)
             await session.flush()
             await session.refresh(new_user)
             await session.commit()
-        return new_user
     
     @staticmethod
     async def select_user(

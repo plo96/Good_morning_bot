@@ -1,4 +1,7 @@
 from abc import ABC
+from datetime import time
+
+from src.core.schemas import CityDTO
 
 
 class BotTexts(ABC):
@@ -10,7 +13,13 @@ class BotTexts(ABC):
 		return f"""
 		Приветствую, {user_name}!
 		Данный бот будет ежедневно желать тебе доброго утра и рассказывать о прогнозе погоды на сегодня.
-		Осталось только провести несколько настроек. Для этого выберите пункт 'Настроить пользователя'.
+		Осталось только провести несколько настроек. Для этого вызовите меню и выберите пункт 'Настроить пользователя'.
+		"""
+	
+	@staticmethod
+	def menu_text() -> str:
+		return """
+		Выберите нужный пункт меню.
 		"""
 	
 	@staticmethod
@@ -61,6 +70,39 @@ class BotTexts(ABC):
 	@staticmethod
 	def config_city_text() -> str:
 		return """
-			Введите название вашего города на латинице (например: 'Moscow').
-			Или нажмите на кнопку ниже, чтобы предоставить доступ к вашей геолокации.
+		Введите название вашего города на латинице (например: 'Moscow').
+		"""
+	
+	@staticmethod
+	def config_wrong_city_text() -> str:
+		return """
+		К сожалению, вашего города не найдено, попробуйте ввести название по-другому или использовать соседний город.
+		"""
+	
+	@staticmethod
+	def config_choose_city_text(city: CityDTO) -> str:
+		return f"""
+		Вы имеете ввиду город {city.name}, который находится в {city.state} страны {city.country}?
+		"""
+	
+	@staticmethod
+	def config_choose_sex_text() -> str:
+		return """
+		Выберите ваш пол.
+		"""
+	
+	@staticmethod
+	def config_done_text(
+		wake_up_time: time,
+	) -> str:
+		return f"""
+		Ваше настройки успешно сохранены.
+		Вам будут отправляться автоматические сообщения в {wake_up_time}.
+		"""
+	
+	@staticmethod
+	def a_lot_of_users_text() -> str:
+		return """
+			К сожалению, в настоящий момент превышено максимальное число пользователей.
 			"""
+	

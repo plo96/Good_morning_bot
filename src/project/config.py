@@ -18,6 +18,8 @@ class Settings:
 	home_dir: Path
 	db_echo: bool
 	admin_id: int
+	max_number_of_users: int
+	redis_url: str = 'redis://localhost:6379/0'
 	
 	def __post_init__(self):
 		self.db_url_sqlite_async: str = f"sqlite+aiosqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
@@ -33,4 +35,5 @@ settings = Settings(
 	home_dir=HOME_DIR,
 	db_echo=False,
 	admin_id=int(os.getenv('ADMIN_ID')),
+	max_number_of_users=int(os.getenv('MAX_NUMBER_OF_USERS')),
 )
