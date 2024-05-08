@@ -1,8 +1,13 @@
+from logging import getLogger, INFO
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from src.project.config import settings
-from handlers import router
+from src.my_bot.handlers import router
+
+logger = getLogger()
+logger.setLevel(INFO)
 
 
 async def start_bot(bot: Bot):

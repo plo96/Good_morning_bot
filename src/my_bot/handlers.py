@@ -29,9 +29,8 @@ async def start(message: Message, state: FSMContext):
 		),
 		reply_markup=kb.menu,
 	)
-	
 
-@router.message(F.text == "◀️ Выйти в меню")
+
 @router.callback_query(F.data == "menu")
 async def menu(
 		callback: CallbackQuery,
@@ -39,6 +38,11 @@ async def menu(
 ):
 	await state.clear()
 	await callback.message.edit_text(
+		text=callback.message.text,
+		reply_markup=kb.InlineKeyboardMarkup(inline_keyboard=[]),
+	)
+	await callback.message.answer(
+		text='Выберите нужный пункт меню.',
 		reply_markup=kb.menu,
 	)
 
@@ -50,12 +54,12 @@ async def delete_acceptance(
 	user_id = callback.message.from_user.id
 	user = await UserRepository.select_user(user_id=user_id)
 	if not user:
-		await callback.message.edit_text(
+		await callback.message.answer(
 			text=BotTexts.user_not_found_text(),
 			reply_markup=kb.menu,
 		)
 	else:
-		await callback.message.edit_text(
+		await callback.message.answer(
 			text=BotTexts.delete_acceptance_text(),
 			reply_markup=kb.accept_del,
 		)
@@ -66,9 +70,10 @@ async def delete_accept(
 		callback: CallbackQuery,
 	):
 	user_id = callback.message.from_user.id				# TODO: Проверить чей id вылезет - бота или пользователя
+	print(user_id)
 	user = await UserRepository.select_user(user_id=user_id)
 	await UserRepository.del_user(user)
-	await callback.message.edit_text(
+	await callback.message.answer(
 		text=BotTexts.success_delete_text(),
 		reply_markup=kb.menu,
 	)
@@ -78,7 +83,7 @@ async def delete_accept(
 async def delete_confirm(
 		callback: CallbackQuery,
 	):
-	await callback.message.edit_text(
+	await callback.message.answer(
 		reply_markup=kb.menu,
 	)
 
@@ -91,13 +96,14 @@ async def config_start(
 	user_id = callback.message.from_user.id
 	user = await UserRepository.select_user(user_id=user_id)
 	if user:
-		await callback.message.edit_text(
+		await callback.message.answer(
 			text=BotTexts.config_already_exists()
 		)
 	else:
 		await state.set_state(StepsForm.GET_HOUR)
-		await callback.message.edit_text(
-			text=BotTexts.config_start_text()
+		await callback.message.answer(
+			text=BotTexts.config_start_text(),
+			reply_markup=kb.InlineKeyboardMarkup(inline_keyboard=[])
 		)
 		await callback.message.answer(
 			text=BotTexts.config_hours_text(),
@@ -105,30 +111,30 @@ async def config_start(
 		)
 	
 	
-@router.callback_query((StepsForm.GET_HOUR | F.data.startswith("/hour_")))
+@router.callback_query((StepsForm.GET_HOUR and F.data.startswith("/hour_")))
 async def config_minutes(
 	callback: CallbackQuery,
 	state: FSMContext,
 ):
-	hour = callback.data.lstrip('hour_')
+	hour = callback.data.lstrip('/hour_')
 	await state.set_state(StepsForm.GET_MINUTES)
-	await callback.message.edit_text(
+	await callback.message.answer(
 		text=BotTexts.config_minutes_text(),
 		reply_markup=kb.get_minutes_choose_kb(hour=hour),
 	)
 
 	
-@router.callback_query((StepsForm.GET_MINUTES | F.data.startswith("/time_")))
+@router.callback_query((StepsForm.GET_MINUTES and F.data.startswith("/time_")))
 async def config_city(
 	callback: CallbackQuery,
 	state: FSMContext,
 ):
-	hour, minutes = callback.data.split('_')[1, 2]
+	hour, minutes = callback.data.split('_')[1: 3]
 	await state.update_data(time=time(int(hour), int(minutes)))
 	await state.set_state(StepsForm.GET_CITY)
-	await callback.message.edit_text(
+	await callback.message.answer(
 		text=BotTexts.config_city_text(),
-		reply_markup=kb.get_location_kb(),
+		# reply_markup=kb.get_location_kb(),
 	)
 
 
@@ -137,8 +143,7 @@ async def config_city(
 		message: Message,
 		state: FSMContext,
 ):
-	
-	time = await state.get_data()['time']
+	time = (await state.get_data())['time']
 	await message.answer(
 		text=f'Твоё время: {time}. Твой введённый город: {message.text}',
 	)
