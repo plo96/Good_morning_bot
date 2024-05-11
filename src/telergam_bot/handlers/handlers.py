@@ -2,26 +2,20 @@ from datetime import time
 
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramBadRequest
 
+from src.core.schemas import CityDTO
 from src.telergam_bot.utils import BotTexts, StepsForm
 from src.telergam_bot.keyboards import BotKeyboards
-from src.database.user_repository import UserRepository
+from src.database.user_repository import UserRepositorySqlite
 from src.outer_apis_workers import geoposition_worker
 from src.core.models import User
 from src.project import settings
 from src.scheduler import add_new_async_schedule_job, del_async_schedule_job
 
 router = Router()
-
-
-@router.message(Command("id"))
-async def get_id(message: Message):
-	print(message.from_user)
-	await message.reply(
-		text=str(message.from_user.id),
-	)
 
 
 @router.message(Command("start"))
@@ -35,16 +29,26 @@ async def start(
 	)
 
 
-@router.callback_query(F.data == "menu")
+@router.message(Command("menu"))
 async def menu(
-		callback: CallbackQuery,
+		message: Message,
+		bot: Bot,
 		state: FSMContext
 ):
+	state_data = await state.get_data()
+	if 'last_kb' in state_data.keys():
+		last_kb = (await state.get_data()).__getitem__('last_kb')
+		if last_kb:
+			try:
+				await bot.edit_message_reply_markup(chat_id=message.chat.id, message_id=last_kb, reply_markup=None)
+			except TelegramBadRequest:
+				pass
 	await state.clear()
-	await callback.message.answer(
+	new_message = await message.answer(
 		text=BotTexts.menu_text(),
 		reply_markup=BotKeyboards.get_menu_kb(),
 	)
+	await state.update_data(last_kb=new_message.message_id)
 
 
 @router.callback_query(F.data == "delete")
@@ -52,50 +56,53 @@ async def delete_acceptance(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
-	user_id = callback.message.from_user.id  	# TODO: Проверить чей id вылезет - бота или пользователя
-	print(user_id)
-	user = await UserRepository.select_user(user_id=user_id)
+	user_id = callback.from_user.id
+	user = await UserRepositorySqlite.select_user(user_id=user_id)
 	
 	if not user:
-		await callback.message.answer(
+		new_message = await callback.message.answer(
 			text=BotTexts.user_not_found_text(),
 			reply_markup=BotKeyboards.get_menu_kb(),
 		)
 	else:
 		await state.set_state(StepsForm.DELETION_ACCEPT)
-		await callback.message.answer(
+		new_message = await callback.message.answer(
 			text=BotTexts.delete_acceptance_text(),
 			reply_markup=BotKeyboards.get_accept_kb(),
 		)
 
+	await state.update_data(last_kb=new_message.message_id)
 
-@router.callback_query(StepsForm.DELETION_ACCEPT and F.data == "yes")
+
+@router.callback_query(StateFilter(StepsForm.DELETION_ACCEPT), F.data == "yes")
 async def delete_accept(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
-	user_id = callback.message.from_user.id  # TODO: Проверить чей id вылезет - бота или пользователя
-	print(user_id)
-	user = await UserRepository.select_user(user_id=user_id)
-	await UserRepository.del_user(user)
+	user_id = callback.from_user.id
+	user = await UserRepositorySqlite.select_user(user_id=user_id)
+	job_id = user.job_id
+	await UserRepositorySqlite.del_user(user)
+	del_async_schedule_job(job_id)
 	await state.clear()
-	await callback.message.answer(
+	new_message = await callback.message.answer(
 		text=BotTexts.success_delete_text(),
 		reply_markup=BotKeyboards.get_menu_kb(),
 	)
-	del_async_schedule_job()			# TODO: Разобраться с удалением тасок по расписанию
+	await state.update_data(last_kb=new_message.message_id)
 	
 
-@router.callback_query(StepsForm.DELETION_ACCEPT and F.data == "no")
+@router.callback_query(StateFilter(StepsForm.DELETION_ACCEPT), F.data == "no")
 async def delete_confirm(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
 	await state.clear()
-	await callback.message.answer(
+	new_message = await callback.message.answer(
 		text=BotTexts.menu_text(),
 		reply_markup=BotKeyboards.get_menu_kb(),
 	)
+	await state.update_data(last_kb=new_message.message_id)
 
 
 @router.callback_query(F.data == "config")
@@ -103,10 +110,10 @@ async def config_start(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
-	user_id = callback.message.from_user.id
-	user = await UserRepository.select_user(user_id=user_id)
+	user_id = callback.from_user.id
+	user = await UserRepositorySqlite.select_user(user_id=user_id)
 	if user:
-		await callback.message.answer(
+		new_message = await callback.message.answer(
 			text=BotTexts.config_already_exists(),
 			reply_markup=BotKeyboards.get_menu_kb(),
 		)
@@ -115,39 +122,43 @@ async def config_start(
 		await callback.message.answer(
 			text=BotTexts.config_start_text(),
 		)
-		await callback.message.answer(
+		new_message = await callback.message.answer(
 			text=BotTexts.config_hours_text(),
 			reply_markup=BotKeyboards.get_hours_choose_kb(),
 		)
 
+	await state.update_data(last_kb=new_message.message_id)
 
-@router.callback_query(StepsForm.GET_HOUR and F.data.startswith("/hour_"))
+
+@router.callback_query(StateFilter(StepsForm.GET_HOUR), F.data.startswith("/hour_"))
 async def config_minutes(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
 	hour = callback.data.lstrip('/hour_')
 	await state.set_state(StepsForm.GET_MINUTES)
-	await callback.message.answer(
+	new_message = await callback.message.answer(
 		text=BotTexts.config_minutes_text(),
 		reply_markup=BotKeyboards.get_minutes_choose_kb(hour=hour),
 	)
+	await state.update_data(last_kb=new_message.message_id)
 
 
-@router.callback_query(StepsForm.GET_MINUTES and F.data.startswith("/time_"))
+@router.callback_query(StateFilter(StepsForm.GET_MINUTES), F.data.startswith("/time_"))
 async def config_city(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
 	hour, minutes = callback.data.split('_')[1: 3]
-	await state.update_data(time=time(int(hour), int(minutes)))
+	await state.update_data(time=time(int(hour), int(minutes)).isoformat())
 	await state.set_state(StepsForm.GET_CITY)
 	await callback.message.answer(
 		text=BotTexts.config_city_text(),
 	)
+	await state.update_data(last_kb=None)
 
 
-@router.message(StepsForm.GET_CITY)
+@router.message(StateFilter(StepsForm.GET_CITY))
 async def config_city(
 		message: Message,
 		state: FSMContext,
@@ -160,80 +171,97 @@ async def config_city(
 		)
 	else:
 		await state.set_state(StepsForm.CHOOSE_CITY)
-		await state.update_data(list_of_cities=list_of_cities)
+		await state.update_data(list_of_cities=[city.__dict__ for city in list_of_cities])
 		await state.update_data(current_city_index=0)
 		probable_city = list_of_cities[0]
-		await message.answer(
+		new_message = await message.answer(
 			text=BotTexts.config_choose_city_text(city=probable_city),
 			reply_markup=BotKeyboards.get_accept_kb(),
 		)
+		await state.update_data(last_kb=new_message.message_id)
 
 
-@router.callback_query(StepsForm.CHOOSE_CITY and F.data in ('yes', 'no'))
-async def choose_city(
+@router.callback_query(StateFilter(StepsForm.CHOOSE_CITY), F.data == 'yes')
+async def config_choose_city(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
 	current_city_index = (await state.get_data())['current_city_index']
-	list_of_cities = (await state.get_data())['list_of_cities']
-	if F.data == 'no':
-		current_city_index += 1
-		if current_city_index == len(list_of_cities):
-			await callback.message.answer(
-				text=BotTexts.config_wrong_city_text(),
-			)
-		else:
-			await state.update_data(current_city_index=current_city_index)
-			probable_city = list_of_cities[current_city_index]
-			await callback.message.answer(
-				text=BotTexts.config_choose_city_text(city=probable_city),
-				reply_markup=BotKeyboards.get_accept_kb(),
-			)
-	elif F.data == 'yes':
-		await state.set_state(StepsForm.CHOOSE_SEX)
-		city = list_of_cities[current_city_index]
-		await state.update_data(lat=city.lat, lon=city.lon)
-		await callback.message.answer(
-			text=BotTexts.config_choose_sex_text(),
-			reply_markup=BotKeyboards.get_choose_sex_kb(),
-		)
+	list_of_cities_serialized = (await state.get_data())['list_of_cities']
+	list_of_cities = [CityDTO.from_dict(city) for city in list_of_cities_serialized]
+	await state.set_state(StepsForm.CHOOSE_SEX)
+	city = list_of_cities[current_city_index]
+	await state.update_data(lat=city.lat, lon=city.lon)
+	new_message = await callback.message.answer(
+		text=BotTexts.config_choose_sex_text(),
+		reply_markup=BotKeyboards.get_choose_sex_kb(),
+	)
+	await state.update_data(last_kb=new_message.message_id)
 
 
-@router.callback_query(StepsForm.CHOOSE_SEX and F.data in ('male', 'female'))
-async def choose_sex(
-		bot: Bot,
+@router.callback_query(StateFilter(StepsForm.CHOOSE_CITY), F.data == 'no')
+async def config_choose_city(
 		callback: CallbackQuery,
 		state: FSMContext,
 ):
-	users_now = await UserRepository.count_users()
+	current_city_index = (await state.get_data())['current_city_index']
+	list_of_cities_serialized = (await state.get_data())['list_of_cities']
+	list_of_cities = [CityDTO.from_dict(city) for city in list_of_cities_serialized]
+	current_city_index += 1
+	if current_city_index == len(list_of_cities):
+		await state.set_state(StepsForm.GET_CITY)
+		await callback.message.answer(
+			text=BotTexts.config_wrong_city_text(),
+		)
+	else:
+		await state.update_data(current_city_index=current_city_index)
+		probable_city = list_of_cities[current_city_index]
+		new_message = await callback.message.answer(
+			text=BotTexts.config_choose_city_text(city=probable_city),
+			reply_markup=BotKeyboards.get_accept_kb(),
+		)
+		await state.update_data(last_kb=new_message.message_id)
+
+
+@router.callback_query(StateFilter(StepsForm.CHOOSE_SEX), (F.data == 'male' or F.data == 'female'))
+async def choose_sex(
+		callback: CallbackQuery,
+		bot: Bot,
+		state: FSMContext,
+):
+	users_now = await UserRepositorySqlite.count_users()
 	if users_now >= settings.max_number_of_users:
 		await state.clear()
 		await callback.message.answer(
 			text=BotTexts.a_lot_of_users_text(),
-			reply_markup=BotKeyboards.get_menu_kb(),
+			reply_markup=None,
 		)
+
 	else:
 		user_data: dict = await state.get_data()
-		new_user = User(
-			id=callback.message.from_user.id,
-			name=callback.message.from_user.first_name,
-			lat=user_data.__getitem__('lat'),
-			lon=user_data.__getitem__('lon'),
-			sex=F.data,
+		user_data['time'] = time.fromisoformat(user_data['time'])
+
+		job_id = add_new_async_schedule_job(
+			bot=bot,
+			user_id=callback.from_user.id,
 			wake_up_time=user_data.__getitem__('time'),
 		)
-		await UserRepository.add_user(new_user=new_user)
-		
-		add_new_async_schedule_job(
-			bot=bot,
-			user_id=new_user.id,
-			wake_up_time=new_user.wake_up_time,
+
+		new_user = User(
+			_id=callback.from_user.id,
+			name=callback.from_user.first_name,
+			lat=user_data.__getitem__('lat'),
+			lon=user_data.__getitem__('lon'),
+			sex=callback.data,
+			wake_up_time=user_data.__getitem__('time'),
+			job_id=job_id,
 		)
+		await UserRepositorySqlite.add_user(new_user=new_user)
 		
 		await state.clear()
 		await callback.message.answer(
 			text=BotTexts.config_done_text(wake_up_time=user_data.__getitem__('time')),
-			reply_markup=BotKeyboards.get_menu_kb(),
+			reply_markup=None,
 		)
 	
 	

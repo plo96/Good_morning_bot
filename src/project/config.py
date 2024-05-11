@@ -16,16 +16,24 @@ class Settings:
 	gpt_token: str
 	gpt_identification: str
 	home_dir: Path
-	db_echo: bool
 	admin_id: int
 	max_number_of_users: int
-	redis_url: str = 'redis://localhost:6379/0'
-	
+
+	_mongo_user: str
+	_mongo_pwd: str
+	_mongo_host: str
+	_mongo_port: int
+
+	_redis_pwd: str
+	_redis_host: str
+	_redis_port: int
+
 	def __post_init__(self):
-		self.db_url_sqlite_async: str = f"sqlite+aiosqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
-		self.db_url_sqlite_sync: str = f"sqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
-		self.db_url_sqlite_async_test: str = f"sqlite+aiosqlite:///{HOME_DIR}/src/database/db_sqlite/test_db.sqlite3"
-		
+		self.db_uri_mongodb_asyncio: str = f"mongodb://{self._mongo_user}:{self._mongo_pwd}@{self._mongo_host}:{self._mongo_port}/database"
+		self.redis_uri: str = f"redis://:{self._redis_pwd}@{self._redis_host}:{self._redis_port}/0"
+		self.db_url_sqlite_async = f"sqlite+aiosqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
+		self.db_url_sqlite_sync = f"sqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
+
 
 settings = Settings(
 	bot_token=os.getenv("BOT_TOKEN"),
@@ -33,7 +41,13 @@ settings = Settings(
 	gpt_identification=os.getenv("YANDEX_GPT_IDENTIFICATION"),
 	gpt_token=os.getenv("YANDEX_GPT_API_KEY"),
 	home_dir=HOME_DIR,
-	db_echo=False,
 	admin_id=int(os.getenv('ADMIN_ID')),
 	max_number_of_users=int(os.getenv('MAX_NUMBER_OF_USERS')),
+	_mongo_user=os.getenv("MONGO_USER"),
+	_mongo_pwd=os.getenv("MONGO_PWD"),
+	_mongo_host=os.getenv("MONGO_HOST"),
+	_mongo_port=int(os.getenv("MONGO_PORT")),
+	_redis_pwd=os.getenv("REDIS_PWD"),
+	_redis_host=os.getenv("REDIS_HOST"),
+	_redis_port=int(os.getenv("REDIS_PORT")),
 )

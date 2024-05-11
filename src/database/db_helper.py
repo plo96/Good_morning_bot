@@ -32,4 +32,4 @@ class DatabaseHelper:
 		return self._session_factory
 
 
-db_helper = DatabaseHelper(url=settings.db_url_sqlite_async, echo=settings.db_echo)
+db_helper = DatabaseHelper(url=settings.db_url_sqlite_async, echo=False)

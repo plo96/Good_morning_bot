@@ -6,21 +6,21 @@ from src.core.models import User
 
 @dataclass
 class UserDTO:
-	id: int
-	chat_id: int
+	_id: int
 	name: str
 	lat: float
 	lon: float
 	wake_up_time: time
+	job_id: str
 	
 	@staticmethod
 	def from_model(model: User):
 		return UserDTO(
-			id=model.id,
-			chat_id=model.chat_id,
+			_id=model.id,
 			name=model.name,
 			lat=model.lat,
 			lon=model.lon,
 			wake_up_time=model.wake_up_time,
+			job_id=model.job_id,
 		)
 	

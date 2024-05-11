@@ -5,7 +5,7 @@ from src.project.exceptions import GeopositionalApiError
 from src.core.schemas import CityDTO
 
 
-OPENWEATHERMAP_URL = "http://api.openweathermap.org/data/2.5/forecast"
+OPENWEATHERMAP_URL = "http://api.openweathermap.org/geo/1.0/direct"
 
 
 class GeopositionWorker:
@@ -26,7 +26,7 @@ class GeopositionWorker:
             async with client.get(
                 url=self._url,
                 params={
-                    "city": city_name,
+                    "q": city_name,
                     "appid": self._token,
                 }
             ) as response:

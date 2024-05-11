@@ -29,7 +29,7 @@ class GptWorker:
             "modelUri": self._model_uri,
             "completionOptions": {
                 "stream": False,
-                "temperature": 0.6,
+                "temperature": 0.8,
                 "maxTokens": "500"
             },
             "messages": [

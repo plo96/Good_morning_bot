@@ -10,19 +10,20 @@ from .base import Base
 
 
 class Sex(Enum):
-	male = "male"
-	female = "female"
+    male = "male"
+    female = "female"
 
 
 class User(Base):
-	"""ОРМ-класс с декларативным объявлением с помощью SQLAlchemy для пользователей"""
-	__tablename__ = 'users'
-	
-	id: Mapped[int] = mapped_column(
-		primary_key=True,
-	)
-	name: Mapped[str]
-	lat: Mapped[float]
-	lon: Mapped[float]
-	sex: Mapped[Sex]
-	wake_up_time: Mapped[time]
+    """ОРМ-класс с декларативным объявлением с помощью SQLAlchemy для пользователей"""
+    __tablename__ = 'users'
+
+    _id: Mapped[int] = mapped_column(
+        primary_key=True,
+    )
+    name: Mapped[str]
+    lat: Mapped[float]
+    lon: Mapped[float]
+    sex: Mapped[Sex]
+    wake_up_time: Mapped[time]
+    job_id: Mapped[str]

@@ -7,7 +7,7 @@ from src.scheduler import async_scheduler
 
 async def main():
 	basicConfig(level=INFO)
-	await async_scheduler.start()
+	async_scheduler.start()
 	await init_bot()
 
 

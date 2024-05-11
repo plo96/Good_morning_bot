@@ -7,7 +7,7 @@ from src.database.db_helper import db_helper
 session_factory: async_sessionmaker = db_helper.get_session_factory()
 
 
-class UserRepository:
+class UserRepositorySqlite:
     @staticmethod
     async def add_user(
             new_user: User,
@@ -23,7 +23,7 @@ class UserRepository:
             user_id: int,
     ) -> User | None:
         async with session_factory() as session:
-            stmt = select(User).filter_by(id=user_id)
+            stmt = select(User).filter_by(_id=user_id)
             res = await session.execute(stmt)
             user = res.scalars().one_or_none()
         return user

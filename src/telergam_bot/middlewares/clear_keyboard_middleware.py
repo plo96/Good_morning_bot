@@ -3,7 +3,7 @@ from typing import Callable, Any, Awaitable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
 
-from src.my_bot.keyboards import BotKeyboards
+from src.telergam_bot.keyboards import BotKeyboards
 
 
 class ClearPreviousKeyboard(BaseMiddleware):
@@ -13,9 +13,6 @@ class ClearPreviousKeyboard(BaseMiddleware):
 			event: CallbackQuery,
 			data: Dict[str, Any],
 	) -> Any:
-		await event.message.edit_text(
-			text=event.message.text,
-			reply_markup=BotKeyboards.get_empty_kb(),
-		)
+		await event.message.edit_reply_markup(None)
 		return await handler(event, data)
 	

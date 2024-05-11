@@ -3,8 +3,8 @@ from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram.fsm.storage.redis import RedisStorage
 
 from src.project.config import settings
-from src.my_bot.handlers import router
-from src.my_bot.middlewares import ClearPreviousKeyboard
+from src.telergam_bot.handlers.handlers import router
+from src.telergam_bot.middlewares.clear_keyboard_middleware import ClearPreviousKeyboard
 
 
 async def start_bot(bot: Bot):
@@ -24,7 +24,7 @@ async def stop_bot(bot: Bot):
 async def init_bot():
 	bot = Bot(token=settings.bot_token)
 	
-	storage = RedisStorage.from_url(settings.redis_url)
+	storage = RedisStorage.from_url(settings.redis_uri)
 	
 	dp = Dispatcher(storage=storage)
 	
