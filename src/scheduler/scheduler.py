@@ -5,6 +5,7 @@ from aiogram import Bot
 
 from src.scheduler.schedule_jobs import say_good_morning
 
+
 async_scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 
 

@@ -11,15 +11,10 @@ class DatabaseHelper:
             uri: str,
     ):
         self._uri = uri
+        self._client = AsyncIOMotorClient(self._uri)
 
-    async def get_session(self) -> AsyncGenerator[AsyncIOMotorClientSession, Any]:
-
-        client = AsyncIOMotorClient(self._uri)
-        try:
-            async with await client.start_session() as session:
-                yield session
-        finally:
-            client.close()
+    def get_client(self) -> AsyncIOMotorClient:
+        return self._client
 
 
-db_helper = DatabaseHelper(settings.db_uri_mongodb_asyncio)
+db_helper = DatabaseHelper(settings.db_url_mongodb)

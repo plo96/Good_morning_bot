@@ -1,0 +1,15 @@
+1) Разделение handlers по группам.
+2) Дополнительные сообщения с визуальным подтверждением выбранных данных.
+3) Запуск всех задач для сохраненных пользователей при запуске приложения.
+4) Корректировка ошибок при запросах к внешним API.
+5) Возможность посмотреть свои настройки профиля?
+6) Тесты?
+7) Настройка docker-compose под приложение
+8) Деплой на виртуальную машину (YandexCloud? CludRu?)
+
+Команды для запуска контейнеров в терминале (пока не дошел до докер-компоуз)Ж
+redis:
+    sudo docker run -d -p 6379:6379 --name my_redis redis redis-server --requirepass 'admin'
+mongodb:
+    sudo docker run -d -p 27017:27017 --name mongodb -e MONGO_INITDB_ROOT_USERNAME='admin' -e MONGO_INITDB_ROOT_PASSWORD='admin' mongo
+

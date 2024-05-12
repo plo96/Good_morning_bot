@@ -32,7 +32,7 @@ class GeopositionWorker:
             ) as response:
                 response = await response.json()
                 if not response or not isinstance(response, list):
-                    raise GeopositionalApiError
+                    raise GeopositionalApiError         # TODO: возвращать пустой лист
 
                 list_of_cities: list = []
                 for result in response:

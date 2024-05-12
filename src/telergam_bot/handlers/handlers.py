@@ -6,12 +6,11 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
-from src.core.schemas import CityDTO
+from src.core.schemas import CityDTO, UserDTO
 from src.telergam_bot.utils import BotTexts, StepsForm
 from src.telergam_bot.keyboards import BotKeyboards
-from src.database.user_repository import UserRepositorySqlite
+from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
 from src.outer_apis_workers import geoposition_worker
-from src.core.models import User
 from src.project import settings
 from src.scheduler import add_new_async_schedule_job, del_async_schedule_job
 
@@ -57,7 +56,7 @@ async def delete_acceptance(
 		state: FSMContext,
 ):
 	user_id = callback.from_user.id
-	user = await UserRepositorySqlite.select_user(user_id=user_id)
+	user = await UserRepository.select_user(user_id=user_id)
 	
 	if not user:
 		new_message = await callback.message.answer(
@@ -80,9 +79,9 @@ async def delete_accept(
 		state: FSMContext,
 ):
 	user_id = callback.from_user.id
-	user = await UserRepositorySqlite.select_user(user_id=user_id)
+	user = await UserRepository.select_user(user_id=user_id)
 	job_id = user.job_id
-	await UserRepositorySqlite.del_user(user)
+	await UserRepository.del_user(user_id=user_id)
 	del_async_schedule_job(job_id)
 	await state.clear()
 	new_message = await callback.message.answer(
@@ -111,7 +110,7 @@ async def config_start(
 		state: FSMContext,
 ):
 	user_id = callback.from_user.id
-	user = await UserRepositorySqlite.select_user(user_id=user_id)
+	user = await UserRepository.select_user(user_id=user_id)
 	if user:
 		new_message = await callback.message.answer(
 			text=BotTexts.config_already_exists(),
@@ -229,7 +228,7 @@ async def choose_sex(
 		bot: Bot,
 		state: FSMContext,
 ):
-	users_now = await UserRepositorySqlite.count_users()
+	users_now = await UserRepository.count_users()
 	if users_now >= settings.max_number_of_users:
 		await state.clear()
 		await callback.message.answer(
@@ -247,16 +246,16 @@ async def choose_sex(
 			wake_up_time=user_data.__getitem__('time'),
 		)
 
-		new_user = User(
+		new_user = UserDTO(
 			_id=callback.from_user.id,
 			name=callback.from_user.first_name,
 			lat=user_data.__getitem__('lat'),
 			lon=user_data.__getitem__('lon'),
 			sex=callback.data,
-			wake_up_time=user_data.__getitem__('time'),
+			wake_up_time=user_data.__getitem__('time').isoformat(),
 			job_id=job_id,
 		)
-		await UserRepositorySqlite.add_user(new_user=new_user)
+		await UserRepository.add_user(new_user=new_user)
 		
 		await state.clear()
 		await callback.message.answer(

@@ -24,7 +24,7 @@ async def stop_bot(bot: Bot):
 async def init_bot():
 	bot = Bot(token=settings.bot_token)
 	
-	storage = RedisStorage.from_url(settings.redis_uri)
+	storage = RedisStorage.from_url(settings.redis_url)
 	
 	dp = Dispatcher(storage=storage)
 	

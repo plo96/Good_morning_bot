@@ -1,48 +1,51 @@
-from motor.motor_asyncio import AsyncIOMotorClientSession
+from typing import AsyncGenerator, Any, Callable
+
+from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorClient
 
 from src.core.schemas import UserDTO
 from src.database.db_helper_mongo import db_helper
 
 
 class UserRepositoryMongo:
-    @staticmethod
+    database_name: str = 'database'
+    collection_name: str = 'users'
+
+    @classmethod
     async def add_user(
+            cls,
             new_user: UserDTO,
-            session: AsyncIOMotorClientSession = db_helper.get_session(),
+            client: AsyncIOMotorClient = db_helper.get_client(),
     ) -> None:
-        async with session.start_transaction():
-            client = session.client
-            users_collection = client['database']['users']
-            await users_collection.insert_one(new_user.__dict__)
+        collection = client[cls.database_name][cls.collection_name]
+        await collection.insert_one(new_user.__dict__)
 
-    @staticmethod
+    @classmethod
     async def select_user(
+            cls,
             user_id: int,
-            session: AsyncIOMotorClientSession = db_helper.get_session(),
+            client: AsyncIOMotorClient = db_helper.get_client(),
     ) -> UserDTO | None:
-        async with session.start_transaction():
-            client = session.client
-            users_collection = client['database']['users']
-            result = await users_collection.find_one({'_id': user_id})
-            user = UserDTO(**result)
-            return user
+        collection = client[cls.database_name][cls.collection_name]
+        result = await collection.find_one({'_id': user_id})
+        if not result:
+            return
+        user = UserDTO(**result)
+        return user
 
-    @staticmethod
+    @classmethod
     async def count_users(
-            session: AsyncIOMotorClientSession = db_helper.get_session(),
+            cls,
+            client: AsyncIOMotorClient = db_helper.get_client(),
     ) -> int:
-        async with session.start_transaction():
-            client = session.client
-            users_collection = client['database']['users']
-            result = await users_collection.count_documents({})
+        collection = client[cls.database_name][cls.collection_name]
+        result = await collection.count_documents({})
         return result
 
-    @staticmethod
+    @classmethod
     async def del_user(
+            cls,
             user_id: int,
-            session: AsyncIOMotorClientSession = db_helper.get_session(),
+            client: AsyncIOMotorClient = db_helper.get_client(),
     ) -> None:
-        async with session.start_transaction():
-            client = session.client
-            users_collection = client['database']['users']
-            await users_collection.delete_one({'_id': {user_id}})
+        collection = client[cls.database_name][cls.collection_name]
+        await collection.delete_one({'_id': user_id})

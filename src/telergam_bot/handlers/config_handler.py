@@ -1,3 +1,20 @@
+from datetime import time
+
+from aiogram import Router, F, Bot
+from aiogram.types import Message, CallbackQuery
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramBadRequest
+
+from src.core.schemas import CityDTO, UserDTO
+from src.telergam_bot.utils import BotTexts, StepsForm
+from src.telergam_bot.keyboards import BotKeyboards
+from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
+from src.outer_apis_workers import geoposition_worker
+from src.project import settings
+from src.scheduler import add_new_async_schedule_job, del_async_schedule_job
+
+router = Router()
 
 
 @router.callback_query(F.data == "config")
