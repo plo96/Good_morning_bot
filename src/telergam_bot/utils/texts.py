@@ -1,7 +1,7 @@
 from abc import ABC
 from datetime import time
 
-from src.core.schemas import CityDTO
+from src.core.schemas import CityDTO, UserDTO
 
 
 class BotTexts(ABC):
@@ -13,7 +13,7 @@ class BotTexts(ABC):
 		return f"""
 		Приветствую, {user_name}!
 		Данный бот будет ежедневно желать тебе доброго утра и рассказывать о прогнозе погоды на сегодня.
-		Осталось только провести несколько настроек. Для этого вызовите меню и выберите пункт 'Настроить пользователя'.
+		Осталось только провести несколько настроек. Для этого вызовите меню и выберите пункт 'Настройки пользователя'.
 		"""
 	
 	@staticmethod
@@ -41,11 +41,13 @@ class BotTexts(ABC):
 		"""
 	
 	@staticmethod
-	def config_already_exists() -> str:
-		return """
-		Похоже, в моей базе данных уже имеются настройки для вашего аккаунта!
-		Для повторной настройки необходимо сначала удалить старые данные.
-		Для удаления можете воспользоваться коммандой 'Удалить пользователя'.
+	def config_already_exists(user: UserDTO) -> str:
+		return f"""
+		Для вашего профиля сохранены настройки:
+		Ваше время подъёма: {user.wake_up_time}
+		Ваш город: {user.city.name}({user.city.state}, {user.city.country})
+		Ваш пол: {user.sex}
+		Для удаления можете воспользоваться коммандой 'Удаление пользователя'.
 		"""
 	
 	@staticmethod
@@ -60,11 +62,22 @@ class BotTexts(ABC):
 		Выберите промежуток времени, когда вы встаёте по утрам:
 		"""
 
+	@staticmethod
+	def config_hours_accept_text(hour) -> str:
+		return f"""
+		Вы выбрали промежуток с {hour}:00 до {hour}:59.
+		"""
 
 	@staticmethod
 	def config_minutes_text() -> str:
 		return """
 		Давайте уточним это время:
+		"""
+	
+	@staticmethod
+	def config_time_accept_text(hour, minutes) -> str:
+		return f"""
+		Выбрано время {hour}:{minutes}.
 		"""
 	
 	@staticmethod
@@ -86,9 +99,21 @@ class BotTexts(ABC):
 		"""
 	
 	@staticmethod
+	def config_city_accept_text(city: CityDTO) -> str:
+		return f"""
+		Вы выбрали город "{city.name}({city.state}, {city.country})".
+		"""
+	
+	@staticmethod
 	def config_choose_sex_text() -> str:
 		return """
 		Выберите ваш пол.
+		"""
+	
+	@staticmethod
+	def config_accept_sex_text(sex: str) -> str:
+		return f"""
+		Вы выбрали пол {sex}.
 		"""
 	
 	@staticmethod
@@ -98,6 +123,8 @@ class BotTexts(ABC):
 		return f"""
 		Ваше настройки успешно сохранены.
 		Вам будут отправляться автоматические сообщения в {wake_up_time}.
+		Подробные настройки аккаунта можно посмотреть в разделе "Настройки пользователя".
+		Удалить пользователя можно в разделе "Удаление пользователя".
 		"""
 	
 	@staticmethod

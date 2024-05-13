@@ -31,8 +31,6 @@ class Settings:
 	def __post_init__(self):
 		self.db_url_mongodb: str = f"mongodb://{self._mongo_user}:{self._mongo_pwd}@{self._mongo_host}:{self._mongo_port}"
 		self.redis_url: str = f"redis://:{self._redis_pwd}@{self._redis_host}:{self._redis_port}/0"
-		self.db_url_sqlite_async = f"sqlite+aiosqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
-		self.db_url_sqlite_sync = f"sqlite:///{HOME_DIR}/src/database/db_sqlite/db.sqlite3"
 
 
 settings = Settings(

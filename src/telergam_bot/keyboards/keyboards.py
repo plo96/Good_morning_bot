@@ -8,8 +8,8 @@ class BotKeyboards:
     def get_menu_kb():
         menu = [
             [
-                InlineKeyboardButton(text="Удалить пользователя", callback_data="delete"),
-                InlineKeyboardButton(text="Настроить пользователя", callback_data="config")
+                InlineKeyboardButton(text="Удаление пользователя", callback_data="delete"),
+                InlineKeyboardButton(text="Настройки пользователя", callback_data="config")
             ],
         ]
         menu = InlineKeyboardMarkup(inline_keyboard=menu)

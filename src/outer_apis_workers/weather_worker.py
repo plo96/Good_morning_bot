@@ -4,6 +4,8 @@ import aiohttp
 
 from src.project.config import settings
 from src.core.schemas import WeatherDTO
+from src.project.exceptions import WeatherApiException
+from src.outer_apis_workers.multiply_triying import multiply_trying
 
 
 OPENWEATHERMAP_URL = "http://api.openweathermap.org/data/2.5/forecast"
@@ -17,7 +19,8 @@ class WeatherWorker:
     ):
         self._url = url
         self._token = token
-
+    
+    @multiply_trying
     async def get_weather_prediction(
             self,
             lat: float,
@@ -31,8 +34,12 @@ class WeatherWorker:
                         "lat": lat,
                         "lon": lon,
                         "appid": self._token,
-                    }
+                    },
+                    timeout=5,
             ) as response:
+                status_code = await response.status()
+                if status_code != 200:
+                    raise WeatherApiException
                 weather_prediction: list = []
                 for one_weather_predict in (await response.json())['list'][0:4]:
                     weather = WeatherDTO(

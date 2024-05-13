@@ -12,7 +12,7 @@ async def say_good_morning(
     if not user:
         return
     good_morning = await gpt_worker.get_good_morning(sex=user.sex, name=user.name)
-    weather_predict = await weather_worker.get_weather_prediction(lat=user.lat, lon=user.lon)
+    weather_predict = await weather_worker.get_weather_prediction(lat=user.city.lat, lon=user.city.lon)
 
     weather_predict = [
         f"""*{w.time.strftime("%H:%M")}* : Тип погоды - **{', '.join([w_type for w_type in w.weather_type])}**,

@@ -1,7 +1,8 @@
 import aiohttp
 
+from src.outer_apis_workers.multiply_triying import multiply_trying
 from src.project.config import settings
-from src.project.exceptions import GeopositionalApiError
+from src.project.exceptions import GeopositionalApiException
 from src.core.schemas import CityDTO
 
 
@@ -17,6 +18,7 @@ class GeopositionWorker:
         self._url = url
         self._token = token
     
+    @multiply_trying
     async def get_list_of_cities(
             self,
             city_name: str,
@@ -28,12 +30,14 @@ class GeopositionWorker:
                 params={
                     "q": city_name,
                     "appid": self._token,
-                }
+                },
+                timeout=5,
             ) as response:
                 response = await response.json()
-                if not response or not isinstance(response, list):
-                    raise GeopositionalApiError         # TODO: возвращать пустой лист
-
+                status_code = await response.status()
+                print(status_code)              # TODO: delete this
+                if status_code != 200:
+                    raise GeopositionalApiException
                 list_of_cities: list = []
                 for result in response:
                     city = CityDTO.from_dict(result)

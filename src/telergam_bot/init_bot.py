@@ -1,13 +1,19 @@
+"""
+	'Сборка' и инициализация бота, а также все сопутствующие действия.
+"""
+
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram.fsm.storage.redis import RedisStorage
 
 from src.project.config import settings
-from src.telergam_bot.handlers.handlers import router
+from src.telergam_bot.handlers import router
 from src.telergam_bot.middlewares.clear_keyboard_middleware import ClearPreviousKeyboard
+from src.scheduler import add_all_jobs_from_database
 
 
 async def start_bot(bot: Bot):
+	"""Выполнение команд перед запуском бота."""
 	await bot.send_message(
 		settings.admin_id,
 		text='Bot started.'
@@ -15,13 +21,19 @@ async def start_bot(bot: Bot):
 
 
 async def stop_bot(bot: Bot):
+	"""Выполнение команд после остановки бота."""
 	await bot.send_message(
 		settings.admin_id,
 		text='Bot stopped.'
 	)
 
 
-async def init_bot():
+async def init_bot() -> Bot:
+	"""
+	Инициализация бота. Регистрация startup- и shutdown- функций, middleware и router, а также установка комманд.
+	Запуск функции для добавления в задачи по расписанию оповещений для всех пользователей из базы данных.
+	В качестве хранилища данных используется Redis.
+	"""
 	bot = Bot(token=settings.bot_token)
 	
 	storage = RedisStorage.from_url(settings.redis_url)
@@ -40,16 +52,19 @@ async def init_bot():
 			[
 				BotCommand(
 					command='start',
-					description='Приветственное сообщение.'
+					description='Приветственное сообщение.',
 				),
 				BotCommand(
 					command='menu',
-					description='Вызов меню.'
+					description='Вызов меню.',
 				)
 			],
 			BotCommandScopeDefault(),
 		)
 		await bot.delete_webhook(drop_pending_updates=True)
+		
+		await add_all_jobs_from_database(bot=bot)
+		
 		await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 	finally:
 		await bot.session.close()

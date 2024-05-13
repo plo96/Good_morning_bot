@@ -3,8 +3,6 @@ from typing import Callable, Any, Awaitable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
 
-from src.telergam_bot.keyboards import BotKeyboards
-
 
 class ClearPreviousKeyboard(BaseMiddleware):
 	async def __call__(

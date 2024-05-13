@@ -2,17 +2,20 @@
 	Кастомные ислючения для данного приложения.
 """
 
+class OuterAPIExceptions(Exception):
+	"""Ошибки при обращении к внешним API."""
 
-class WeatherApiError(Exception):
+
+class WeatherApiException(OuterAPIExceptions):
 	"""Ошибка при обращении к API прогноза погоды."""
 	pass
 
 
-class GptApiError(Exception):
+class GptApiException(OuterAPIExceptions):
 	"""Ошибка при обращении к API llm-нейросети."""
 	pass
 
 
-class GeopositionalApiError(Exception):
+class GeopositionalApiException(OuterAPIExceptions):
 	"""Ошибка при обращении к API поиска геопозиции."""
 	pass
