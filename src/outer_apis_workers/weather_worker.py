@@ -37,7 +37,7 @@ class WeatherWorker:
                     },
                     timeout=5,
             ) as response:
-                status_code = await response.status()
+                status_code = response.status
                 if status_code != 200:
                     raise WeatherApiException
                 weather_prediction: list = []

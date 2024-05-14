@@ -83,7 +83,7 @@ class BotTexts(ABC):
 	@staticmethod
 	def config_city_text() -> str:
 		return """
-		Введите название вашего города на латинице (например: 'Moscow').
+		Введите название вашего города (например: 'Moscow' или 'Новгород').
 		"""
 	
 	@staticmethod

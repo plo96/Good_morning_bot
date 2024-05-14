@@ -33,11 +33,10 @@ class GeopositionWorker:
                 },
                 timeout=5,
             ) as response:
-                response = await response.json()
-                status_code = await response.status()
-                print(status_code)              # TODO: delete this
+                status_code = response.status
                 if status_code != 200:
                     raise GeopositionalApiException
+                response = await response.json()
                 list_of_cities: list = []
                 for result in response:
                     city = CityDTO.from_dict(result)

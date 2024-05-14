@@ -43,7 +43,7 @@ class UserRepositoryMongo:
         :return: None
         """
         collection = client[cls.database_name][cls.collection_name]
-        await collection.update_one({'_id': user_id}, kwargs)
+        await collection.update_one({'_id': user_id}, {"$set": kwargs})
 
     @classmethod
     async def select_user(
@@ -63,7 +63,7 @@ class UserRepositoryMongo:
             return
         user = UserDTO.from_serialised_mongo_dict(result)
         return user
-    
+
     @classmethod
     async def select_all_users(
             cls,
@@ -75,8 +75,7 @@ class UserRepositoryMongo:
         :return: list[UserDTO]
         """
         collection = client[cls.database_name][cls.collection_name]
-        result = await collection.find({})
-        users = [UserDTO.from_serialised_mongo_dict(user) for user in result]
+        users = [UserDTO.from_serialised_mongo_dict(user) async for user in collection.find({})]
         return users
 
     @classmethod

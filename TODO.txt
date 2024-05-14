@@ -3,7 +3,7 @@
 3) Настройка docker-compose под приложение
 4) Деплой на виртуальную машину (YandexCloud? CludRu?)
 
-Команды для запуска контейнеров в терминале (пока не дошел до докер-компоуз)Ж
+Команды для запуска контейнеров в терминале (пока не дошел до докер-компоуз)
 redis:
     sudo docker run -d -p 6379:6379 --name my_redis redis redis-server --requirepass 'admin'
 mongodb:

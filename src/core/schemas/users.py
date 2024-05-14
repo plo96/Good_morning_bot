@@ -32,14 +32,13 @@ class UserDTO:
             city=self.city.__dict__,
             sex=self.sex,
             wake_up_time=self.wake_up_time.isoformat(),
-            # wake_up_time=self.wake_up_time,
             job_id=self.job_id,
         )
     
     @staticmethod
     def from_serialised_mongo_dict(mongo_dict: dict):
         """
-        Создание экземпляра класса UserDTO из сериализованного словаря для записи в базу данных mongodb.
+        Создание экземпляра класса UserDTO из сериализованного словаря после чтения из базы данных mongodb.
         :param mongo_dict: Словарь, полученный из базы данных mongodb.
         :return: UserDTO
         """
@@ -49,6 +48,5 @@ class UserDTO:
             city=CityDTO(**mongo_dict.__getitem__('city')),
             sex=mongo_dict.__getitem__('sex'),
             wake_up_time=time.fromisoformat(mongo_dict.__getitem__('wake_up_time')),
-            # wake_up_time=mongo_dict.__getitem__('wake_up_time'),
             job_id=mongo_dict.__getitem__('job_id'),
         )
