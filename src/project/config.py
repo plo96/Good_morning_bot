@@ -1,3 +1,6 @@
+"""
+	Основные настройки проекта. Получение из файла .env.
+"""
 from dataclasses import dataclass
 import os
 from pathlib import Path
@@ -11,6 +14,7 @@ HOME_DIR = Path(__file__).parent.parent.parent.absolute()
 
 @dataclass
 class Settings:
+	"""Класс, содержащий основные настройки приложения."""
 	bot_token: str
 	weather_token: str
 	gpt_token: str
@@ -29,6 +33,9 @@ class Settings:
 	_redis_port: int
 
 	def __post_init__(self):
+		"""
+			'Cборка' url для подключения к сторонним сервисам после основной инициализации объекта класса.
+		"""
 		self.db_url_mongodb: str = f"mongodb://{self._mongo_user}:{self._mongo_pwd}@{self._mongo_host}:{self._mongo_port}"
 		self.redis_url: str = f"redis://:{self._redis_pwd}@{self._redis_host}:{self._redis_port}/0"
 

@@ -16,18 +16,19 @@ class CityDTO:
 	lon: float
 
 	@classmethod
-	def from_dict(cls, some_dict: dict):
+	def from_dict(cls, input_dict: dict):
 		"""
 		Получение экземпляра класса CityDTO из словаря, содержащего большее или равное данному классу число полей.
 		Валидация данных в процессе.
-		:param some_dict: Словарь с данными модели.
+		:param input_dict: Словарь с данными модели.
 		:return: CityDTO
 		"""
-		new_dict: dict = {}
+		valid_dict: dict = {}
 		for attr, needed_type in cls.__annotations__.items():
-			dict_value = some_dict.__getitem__(attr)
-			if str(type(dict_value)) == needed_type:
+			dict_value = input_dict.__getitem__(attr)
+			
+			if (type(dict_value)) != needed_type:
 				raise TypeError(f'Input dict with key "{attr}" is {dict_value}({type(dict_value)}), expected {needed_type}')
 			else:
-				new_dict.__setitem__(attr, dict_value)
-		return CityDTO(**new_dict)
+				valid_dict.__setitem__(attr, dict_value)
+		return CityDTO(**valid_dict)

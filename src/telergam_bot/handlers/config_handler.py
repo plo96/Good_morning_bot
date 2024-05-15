@@ -11,7 +11,7 @@ from src.telergam_bot.keyboards import BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
 from src.outer_apis_workers import geoposition_worker
 from src.project import settings
-from src.scheduler import add_new_async_schedule_job
+from src.scheduler import SchedulerHelper
 
 router = Router()
 
@@ -173,7 +173,7 @@ async def choose_sex(
 			wake_up_time=user_data.__getitem__('time'),
 		)
 		
-		job_id = add_new_async_schedule_job(
+		job_id = SchedulerHelper.add_new_async_schedule_job(
 			bot=bot,
 			user=new_user,
 		)

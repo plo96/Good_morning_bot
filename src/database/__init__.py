@@ -1,3 +1,6 @@
+"""
+	Работа с базой данных.
+"""
 __all__ = (
 	"UserRepositoryMongo",
 )

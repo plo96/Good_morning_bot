@@ -1,6 +1,7 @@
 """
-	Класс для реализации способов взаимодействия с БД для сущности пользователей.
+	Абстрактный класс для реализации способов взаимодействия с БД для сущности пользователей.
 """
+from abc import ABC
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
@@ -8,7 +9,7 @@ from src.core.schemas import UserDTO
 from src.database.db_helper_mongo import db_helper
 
 
-class UserRepositoryMongo:
+class UserRepositoryMongo(ABC):
     """Репозиторий на основе mongodb для сущностей пользователей."""
 
     @classmethod

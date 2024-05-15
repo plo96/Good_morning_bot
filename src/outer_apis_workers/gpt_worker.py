@@ -1,3 +1,6 @@
+"""
+	Создание и инициализация экзмепляра класса, ответственного за взаимодействие с API llm-модели.
+"""
 import aiohttp
 
 from src.outer_apis_workers.multiply_triying import multiply_trying
@@ -8,13 +11,18 @@ GPT_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 
 class GptWorker:
-
+    """Класс для обеспечания взаимодействия с llm-моделью по её API."""
     def __init__(
             self,
             url: str,
             token: str,
             identification: str,
     ):
+        """
+        :param url: URL по которому доступен запрос к модели.
+        :param token: Персональный токен доступа к модели.
+        :param identification: Идентификатор ?проекта? в Yandex-cloud, требуется для работы с YandexGPT.
+        """
         self._url = url
         self._headers = {
             "Authorization": token,
@@ -28,6 +36,13 @@ class GptWorker:
             sex: str,
             name: str,
     ) -> str:
+        """
+        Получение от llm-модели сгенерированного пожелания доброго утра.
+        :param sex: Пол пользователя.
+        :param name: Имя пользователя.
+        :return: Сгенерированная нейросетью строка с индивидуальными пожеланиями.
+                 GptApiException в случае bad request.
+        """
         prompt = {
             "modelUri": self._model_uri,
             "completionOptions": {

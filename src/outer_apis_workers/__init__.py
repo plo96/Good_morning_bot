@@ -1,3 +1,6 @@
+"""
+	Модуль для работы с внешними API.
+"""
 __all__ = (
 	"gpt_worker",
 	"weather_worker",

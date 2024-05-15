@@ -1,5 +1,5 @@
 """
-    Создание и инициализация класса, ответственного за подключение к базе данных.
+    Создание и инициализация класса, ответственного за подключение к базе данных (mongodb).
 """
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 
@@ -25,6 +25,7 @@ class DatabaseHelper:
         return self._client["database"]["users"]
 
     def __del__(self):
+        """Удаление экзмепляра сессии при удалении экземпляра DatabaseHelper."""
         self._client.close()
 
 

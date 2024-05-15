@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from src.telergam_bot.utils import BotTexts, StepsForm
 from src.telergam_bot.keyboards import BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
-from src.scheduler import del_async_schedule_job
+from src.scheduler import SchedulerHelper
 
 router = Router()
 
@@ -41,9 +41,8 @@ async def delete_accept(
 ):
 	user_id = callback.from_user.id
 	user = await UserRepository.select_user(user_id=user_id)
-	job_id = user.job_id
 	await UserRepository.del_user(user_id=user_id)
-	del_async_schedule_job(job_id)
+	SchedulerHelper.del_async_schedule_job(user=user)
 	await state.clear()
 	new_message = await callback.message.answer(
 		text=BotTexts.success_delete_text(),

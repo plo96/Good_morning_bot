@@ -1,5 +1,6 @@
+from asyncio import new_event_loop, get_running_loop
+
 from datetime import time
-from typing import AsyncGenerator
 
 from faker import Faker
 import pytest
@@ -15,12 +16,22 @@ NUM_USERS_FOR_TESTS = 5
 
 
 @pytest.fixture(scope="session")
+def get_loop():
+	try:
+		loop = get_running_loop()
+	except RuntimeError:
+		loop = new_event_loop()
+	yield loop
+	loop.close()
+
+
+@pytest.fixture(scope="session")
 async def fake_client() -> AsyncIOMotorClient:
 	fake_client = AsyncIOMotorClient(settings.db_url_mongodb)
 	return fake_client
 	
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def fake_collection_users(
 		fake_client: AsyncIOMotorClient,
 ) -> AsyncIOMotorCollection:
@@ -34,8 +45,9 @@ def fake_collection_users(
 # 	# await fake_client["database"]["users_test"].delete_many({})
 # 	yield
 # 	# await fake_client["database"]["users_test"].delete_many({})
-# 	fake_client.close() 	# TODO: Проверить закрытие тестового клиента и осуществить здесь если не работает.
+# 	fake_client.close()
 # 	print('DATABASE CONNECTION CLOSED')
+
 
 def get_new_city() -> CityDTO:
 	return CityDTO(

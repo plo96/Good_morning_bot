@@ -21,6 +21,13 @@ async def start(
 	)
 
 
+@router.message(Command("user_info"))			# TODO: delete this
+async def start(
+		message: Message,
+):
+	print(message.from_user)
+
+
 @router.message(Command("menu"))
 async def menu(
 		message: Message,

@@ -1,3 +1,6 @@
+"""
+	Создание и инициализация экзмепляра класса, ответственного за взаимодействие с API геопозиции.
+"""
 import aiohttp
 
 from src.outer_apis_workers.multiply_triying import multiply_trying
@@ -10,6 +13,7 @@ OPENWEATHERMAP_URL = "http://api.openweathermap.org/geo/1.0/direct"
 
 
 class GeopositionWorker:
+    """Класс для взаимодействия с API геопозиции."""
     def __init__(
             self,
             url: str,
@@ -23,7 +27,12 @@ class GeopositionWorker:
             self,
             city_name: str,
     ) -> list[CityDTO]:
-        
+        """
+        Получение списка возможных городов, соответствующих названию.
+        :param city_name: Искомый город.
+        :return: Список моделей CityDTO городов, совпадающих по названию с искомым.
+                 GeopositionalApiException в случае bad request.
+        """
         async with aiohttp.ClientSession() as client:
             async with client.get(
                 url=self._url,
@@ -41,6 +50,7 @@ class GeopositionWorker:
                 for result in response:
                     city = CityDTO.from_dict(result)
                     list_of_cities.append(city)
+                    
         return list_of_cities
 
 
