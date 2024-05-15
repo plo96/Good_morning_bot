@@ -4,20 +4,22 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 
 from src.core.schemas import UserDTO
 
+from tests.conftest import NUM_USERS_FOR_TESTS, get_new_user
+
 
 async def add_users_to_database(
 		collection: AsyncIOMotorCollection,
 		num_of_users: int,
 ) -> None:
 	for _ in range(num_of_users):
-		collection.insert_one(get_new_user().to_serialised_mongo_dict())
+		await collection.insert_one(get_new_user().to_serialised_mongo_dict())
 
 
 @pytest.fixture
 async def clear_database(
 		fake_collection_users: AsyncIOMotorCollection,
 ) -> None:
-	await fake_collection_users.delete({})
+	await fake_collection_users.delete_many({})
 
 
 @pytest.fixture

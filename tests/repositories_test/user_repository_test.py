@@ -6,6 +6,8 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 from src.core.schemas import UserDTO
 from src.database import UserRepositoryMongo as UserRepository
 
+from tests.conftest import NUM_TESTS, NUM_USERS_FOR_TESTS
+
 
 @pytest.mark.parametrize("_", range(NUM_TESTS))
 async def test_user_repository_add_user(
@@ -19,7 +21,7 @@ async def test_user_repository_add_user(
 		collection=fake_collection_users,
 	)
 	
-	users_in_database = await fake_collection_users.find({new_user.id})
+	users_in_database = [user async for user in fake_collection_users.find({'_id': new_user.id})]
 	assert len(users_in_database) == 1
 	user_in_database = users_in_database[0]
 	assert UserDTO.from_serialised_mongo_dict(user_in_database) == new_user

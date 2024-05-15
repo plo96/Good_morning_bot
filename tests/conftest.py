@@ -1,3 +1,4 @@
+from datetime import time
 from typing import AsyncGenerator
 
 from faker import Faker
@@ -14,11 +15,9 @@ NUM_USERS_FOR_TESTS = 5
 
 
 @pytest.fixture(scope="session")
-async def fake_client() -> AsyncGenerator[AsyncIOMotorClient]:
+async def fake_client() -> AsyncIOMotorClient:
 	fake_client = AsyncIOMotorClient(settings.db_url_mongodb)
-	yield fake_client
-	fake_client.close()
-	print('!fake_client CLOSED!')
+	return fake_client
 	
 
 @pytest.fixture
@@ -28,25 +27,23 @@ def fake_collection_users(
 	return fake_client["database"]["users_test"]
 
 
-@pytest.fixture(autouse=True, scope='session')
-async def lifespan(
-		fake_collection_users: AsyncIOMotorCollection,
-):
-	await fake_collection_users.delete({})
-	yield
-	await fake_collection_users.delete({})
-	# async for fake_collection_users.delete({}) #TODO: когда будет доступ к библиотеке, проверить способ вызова функции
-	# print(fake_collection_users.find({}))
-	# await fake_client.close() 	# TODO: Проверить закрытие тестового клиента и осуществить здесь если не работает.
-	
+# @pytest.fixture(autouse=True, scope='session')
+# async def lifespan(
+# 		fake_client: AsyncIOMotorClient,
+# ):
+# 	# await fake_client["database"]["users_test"].delete_many({})
+# 	yield
+# 	# await fake_client["database"]["users_test"].delete_many({})
+# 	fake_client.close() 	# TODO: Проверить закрытие тестового клиента и осуществить здесь если не работает.
+# 	print('DATABASE CONNECTION CLOSED')
 
 def get_new_city() -> CityDTO:
 	return CityDTO(
-		name=fake.city('Ru'),
-		state=fake.state('Ru'),
+		name=fake.city(),
+		state=fake.state(),
 		country=fake.country(),
-		lat=fake.lat(),
-		lon=fake.lon(),
+		lat=float(fake.latitude()),
+		lon=float(fake.longitude()),
 	)
 
 
@@ -55,8 +52,8 @@ def get_new_user() -> UserDTO:
 		id=fake.random.randint(1, 1000),
 		name=fake.first_name(),
 		city=get_new_city(),
-		sex=fake.sex(),
-		wake_up_time=fake.time(),
+		sex=fake.passport_gender(),
+		wake_up_time=time.fromisoformat(fake.time()),
 		job_id=fake.random.randint(1, 1000),
 	)
 	
