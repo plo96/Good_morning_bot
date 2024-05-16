@@ -39,6 +39,7 @@ class GeopositionWorker:
                 params={
                     "q": city_name,
                     "appid": self._token,
+                    "limit": 100,
                 },
                 timeout=5,
             ) as response:
@@ -46,6 +47,7 @@ class GeopositionWorker:
                 if status_code != 200:
                     raise GeopositionalApiException
                 response = await response.json()
+                print(response)
                 list_of_cities: list = []
                 for result in response:
                     city = CityDTO.from_dict(result)

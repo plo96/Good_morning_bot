@@ -1,6 +1,7 @@
 """
 	Настройка логгера для данного приложения.
 """
+from asyncio import create_task
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -18,7 +19,8 @@ class BotMessageHandler(logging.Handler):
 	
 	def emit(self, record):
 		try:
-			...
+			msg = self.format(record)
+			create_task(self.bot.send_message(settings.admin_id, msg))
 			# bot.send_message(settings.admin_id, record)		#TODO: Необходимо отсылать сообщения синхронно
 		except Exception:
 			self.handleError(record)
@@ -39,23 +41,23 @@ def init_logger(name: str, bot: Bot) -> logging.Logger:
 	FORMAT = '[%(levelname)s]_(%(asctime)s)_%(name)s:%(lineno)s - %(message)s'
 	DATEFMT = '%d/%m/%Y %I:%M:%S'
 	
-	bm_handler = BotMessageHandler()
+	bm_handler = BotMessageHandler(bot=bot)
 	bm_handler.setLevel(logging.WARNING)
 	logger.addHandler(bm_handler)
 	
-	if "logs" not in os.listdir(settings.HOME_DIR):
-		os.chdir(settings.HOME_DIR)
+	if "logs" not in os.listdir(settings.home_dir):
+		os.chdir(settings.home_dir)
 		os.mkdir("logs")
 		os.chdir(os.path.dirname(os.path.abspath(__file__)))
 		print(os.curdir)
 	
-	fh = logging.FileHandler(filename=f"{settings.HOME_DIR}\\logs\\current_logs.log", mode='w')
+	fh = logging.FileHandler(filename=f"{settings.home_dir}\\logs\\current_logs.log", mode='w')
 	fh.setFormatter(logging.Formatter(fmt=FORMAT, datefmt=DATEFMT))
 	fh.setLevel(logging.DEBUG)
 	logger.addHandler(fh)
 	
 	rfh = RotatingFileHandler(
-		filename=f"{settings.HOME_DIR}\\logs\\logs.log",
+		filename=f"{settings.home_dir}\\logs\\logs.log",
 		mode='a',
 		maxBytes=5 * 1024 * 1024,
 		backupCount=5
@@ -65,5 +67,19 @@ def init_logger(name: str, bot: Bot) -> logging.Logger:
 	logger.addHandler(rfh)
 	
 	logger.debug('logger was initialized.')
-	
+
+	print(logger.handlers)
+
 	return logger
+
+
+def remove_logger(logger: logging.Logger):
+	for child_logger_name in logger.manager.loggerDict.keys():
+		if not child_logger_name.startswith('main.'): continue
+		print(child_logger_name)
+		child_logger = logging.getLogger(child_logger_name)
+		print(child_logger)
+		print(child_logger.handlers)
+		for handler in child_logger.handlers[:]:
+			print(handler)
+			logger.removeHandler(handler)

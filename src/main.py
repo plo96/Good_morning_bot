@@ -1,7 +1,7 @@
 from logging import basicConfig, INFO
 import asyncio
 
-from src.project.logger import init_logger
+from src.project.logger import init_logger, remove_logger
 from src.telergam_bot import init_bot
 from src.scheduler import SchedulerHelper
 
@@ -16,6 +16,7 @@ async def main():
 		logger.info('Previous tasks running.')
 		await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 	finally:
+		remove_logger(logger)
 		await bot.session.close()
 
 

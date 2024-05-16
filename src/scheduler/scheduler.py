@@ -30,8 +30,10 @@ class SchedulerHelper(ABC):
 		:param user: Пользователь, для которого добавляется задача.
 		:return: Строка с идентификатором job_id.
 		"""
+		job_id = user.job_id
 		new_job = cls._async_scheduler.add_job(
 			say_good_morning,
+			id=job_id,
 			trigger='cron',
 			hour=user.wake_up_time.hour,
 			minute=user.wake_up_time.minute,
