@@ -9,7 +9,7 @@ from src.project.exceptions import GeopositionalApiException
 from src.core.schemas import CityDTO
 
 
-OPENWEATHERMAP_URL = "http://api.openweathermap.org/geo/1.0/direct"
+GEOPOSITION_URL = "http://api.openweathermap.org/geo/1.0/direct"
 
 
 class GeopositionWorker:
@@ -47,7 +47,6 @@ class GeopositionWorker:
                 if status_code != 200:
                     raise GeopositionalApiException
                 response = await response.json()
-                print(response)
                 list_of_cities: list = []
                 for result in response:
                     city = CityDTO.from_dict(result)
@@ -57,6 +56,6 @@ class GeopositionWorker:
 
 
 geoposition_worker = GeopositionWorker(
-    url=OPENWEATHERMAP_URL,
+    url=GEOPOSITION_URL,
     token=settings.weather_token,
 )

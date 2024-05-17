@@ -11,7 +11,7 @@ from src.telergam_bot.middlewares import ClearPreviousKeyboard, LoggingUserDeal
 
 
 async def start_bot(bot: Bot):
-	"""Выполнение команд перед запуском бота."""
+	"""Выполнение команд сразу после запуска бота."""
 	await bot.send_message(
 		settings.admin_id,
 		text='Bot started.'
@@ -19,7 +19,7 @@ async def start_bot(bot: Bot):
 
 
 async def stop_bot(bot: Bot):
-	"""Выполнение команд после остановки бота."""
+	"""Выполнение команд непосредственно перед остановкой бота."""
 	await bot.send_message(
 		settings.admin_id,
 		text='Bot stopped.'

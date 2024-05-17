@@ -1,7 +1,7 @@
 """
 	Схемы для работы с сущностями пользователей.
 """
-from datetime import time
+from datetime import time, timedelta
 
 from dataclasses import dataclass
 from typing import Optional
@@ -14,12 +14,14 @@ class UserDTO:
     """
     Класс для пользователей приложения.
     """
-    id: int
-    name: str
-    city: CityDTO
-    sex: str
-    wake_up_time: time
-    job_id: Optional[str] = None
+    id: int                         # id в телеграм
+    name: str                       # имя пользователя
+    city: CityDTO                   # город
+    sex: str                        # пол
+    wake_up_time: time              # Время пробуждения
+    time_shift: timedelta           # Сдвиг временного пояса
+    job_id: Optional[str] = None    # id привязанной хадачи по расписанию
+    
     
     def to_serialised_mongo_dict(self) -> dict:
         """
@@ -32,6 +34,7 @@ class UserDTO:
             city=self.city.__dict__,
             sex=self.sex,
             wake_up_time=self.wake_up_time.isoformat(),
+            time_shift=self.time_shift.seconds,
             job_id=self.job_id,
         )
     
@@ -48,5 +51,6 @@ class UserDTO:
             city=CityDTO(**mongo_dict.__getitem__('city')),
             sex=mongo_dict.__getitem__('sex'),
             wake_up_time=time.fromisoformat(mongo_dict.__getitem__('wake_up_time')),
+            time_shift=timedelta(seconds=mongo_dict.__getitem__('time_shift')),
             job_id=mongo_dict.__getitem__('job_id'),
         )

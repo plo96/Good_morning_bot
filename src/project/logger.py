@@ -71,15 +71,3 @@ def init_logger(name: str, bot: Bot) -> logging.Logger:
 	print(logger.handlers)
 
 	return logger
-
-
-def remove_logger(logger: logging.Logger):
-	for child_logger_name in logger.manager.loggerDict.keys():
-		if not child_logger_name.startswith('main.'): continue
-		print(child_logger_name)
-		child_logger = logging.getLogger(child_logger_name)
-		print(child_logger)
-		print(child_logger.handlers)
-		for handler in child_logger.handlers[:]:
-			print(handler)
-			logger.removeHandler(handler)

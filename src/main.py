@@ -1,9 +1,10 @@
 from logging import basicConfig, INFO
 import asyncio
 
-from src.project.logger import init_logger, remove_logger
+from src.project.logger import init_logger
 from src.telergam_bot import init_bot
 from src.scheduler import SchedulerHelper
+from src.events import starup_events, shutdown_events
 
 
 async def main():
@@ -12,11 +13,12 @@ async def main():
 	bot, dp = await init_bot()
 	logger = init_logger(name='main', bot=bot)
 	try:
-		await SchedulerHelper.add_all_jobs_from_database(bot=bot)
-		logger.info('Previous tasks running.')
+		await starup_events.refresh_all_time_shift()
+		await starup_events.add_all_jobs_from_database(bot=bot)
+		logger.info('startup tasks done.')
 		await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 	finally:
-		remove_logger(logger)
+		await shutdown_events.del_all_jobs_from_database()
 		await bot.session.close()
 
 

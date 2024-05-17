@@ -10,7 +10,7 @@ from src.core.schemas import WeatherDTO
 from src.project.exceptions import WeatherApiException
 from src.outer_apis_workers.multiply_triying import multiply_trying
 
-OPENWEATHERMAP_URL = "http://api.openweathermap.org/data/2.5/forecast"
+WEATHER_URL = "http://api.openweathermap.org/data/2.5/forecast"
 
 
 class WeatherWorker:
@@ -90,6 +90,6 @@ class WeatherWorker:
 
 
 weather_worker = WeatherWorker(
-    url=OPENWEATHERMAP_URL,
+    url=WEATHER_URL,
     token=settings.weather_token,
 )

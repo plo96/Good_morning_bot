@@ -9,7 +9,7 @@ from src.core.schemas import CityDTO, UserDTO
 from src.telergam_bot.utils import BotTexts, StepsForm
 from src.telergam_bot.keyboards import BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
-from src.outer_apis_workers import geoposition_worker
+from src.outer_apis_workers import geoposition_worker, timezone_worker
 from src.project import settings
 from src.scheduler import SchedulerHelper
 
@@ -165,12 +165,18 @@ async def choose_sex(
 		user_data['time'] = time.fromisoformat(user_data['time'])
 		user_data['city'] = CityDTO(**user_data['city'])
 		
+		time_shift = timezone_worker.get_time_shift(
+			latitude=user_data['city'].lat,
+			longitude=user_data['city'].lon,
+		)
+		
 		new_user = UserDTO(
 			id=callback.from_user.id,
 			name=callback.from_user.first_name,
 			city=user_data.__getitem__('city'),
 			sex=callback.data,
 			wake_up_time=user_data.__getitem__('time'),
+			time_shift=time_shift,
 		)
 		
 		job_id = SchedulerHelper.add_new_async_schedule_job(

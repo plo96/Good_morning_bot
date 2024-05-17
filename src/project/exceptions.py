@@ -2,6 +2,7 @@
 	Кастомные ислючения для данного приложения.
 """
 
+
 class OuterAPIExceptions(Exception):
 	"""Ошибки при обращении к внешним API."""
 
@@ -18,4 +19,9 @@ class GptApiException(OuterAPIExceptions):
 
 class GeopositionalApiException(OuterAPIExceptions):
 	"""Ошибка при обращении к API поиска геопозиции."""
+	pass
+
+
+class TimezoneApiException(OuterAPIExceptions):
+	"""Ошибка при обращении к API определения часового пояса."""
 	pass
