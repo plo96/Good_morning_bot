@@ -4,7 +4,7 @@
 from datetime import time, timedelta
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Mapping, Any
 
 from .cities import CityDTO
 
@@ -39,7 +39,7 @@ class UserDTO:
         )
     
     @staticmethod
-    def from_serialised_mongo_dict(mongo_dict: dict):
+    def from_serialised_mongo_dict(mongo_dict: dict | Mapping[str, Any]):
         """
         Создание экземпляра класса UserDTO из сериализованного словаря после чтения из базы данных mongodb.
         :param mongo_dict: Словарь, полученный из базы данных mongodb.

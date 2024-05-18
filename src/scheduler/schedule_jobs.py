@@ -4,7 +4,8 @@
 from aiogram import Bot
 
 from src.database import UserRepositoryMongo as UserRepository
-from src.outer_apis_workers import weather_worker, gpt_worker
+from src.outer_apis_workers.weather_worker import weather_worker
+from src.outer_apis_workers.gpt_worker import gpt_worker
 
 
 async def say_good_morning(

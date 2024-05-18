@@ -2,16 +2,17 @@ from datetime import time
 
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 from src.core.schemas import CityDTO, UserDTO
 from src.telergam_bot.utils import BotTexts, StepsForm
 from src.telergam_bot.keyboards import BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
-from src.outer_apis_workers import geoposition_worker, timezone_worker
+from src.outer_apis_workers.geoposition_worker import geoposition_worker
+from src.outer_apis_workers.timezone_worker import timezone_worker
 from src.project import settings
-from src.scheduler import SchedulerHelper
+from src.scheduler import Scheduler
 
 router = Router()
 
@@ -165,7 +166,7 @@ async def choose_sex(
 		user_data['time'] = time.fromisoformat(user_data['time'])
 		user_data['city'] = CityDTO(**user_data['city'])
 		
-		time_shift = timezone_worker.get_time_shift(
+		time_shift = await timezone_worker.get_time_shift(
 			latitude=user_data['city'].lat,
 			longitude=user_data['city'].lon,
 		)
@@ -179,7 +180,7 @@ async def choose_sex(
 			time_shift=time_shift,
 		)
 		
-		job_id = SchedulerHelper.add_new_async_schedule_job(
+		job_id = Scheduler.add_new_good_morning_job(
 			bot=bot,
 			user=new_user,
 		)

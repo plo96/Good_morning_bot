@@ -7,11 +7,13 @@ from src.outer_apis_workers.multiply_triying import multiply_trying
 from src.project.config import settings
 from src.project.exceptions import GptApiException
 
+from .i_gpt_worker import IGptWorker
+
 GPT_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 
-class GptWorker:
-    """Класс для обеспечания взаимодействия с llm-моделью по её API."""
+class YandexGptWorker(IGptWorker):
+    """Класс для обеспечания взаимодействия с YandexGPT по её API."""
     def __init__(
             self,
             url: str,
@@ -72,7 +74,7 @@ class GptWorker:
         return result
 
 
-gpt_worker = GptWorker(
+yandex_gpt_worker = YandexGptWorker(
     url=GPT_URL,
     token=f"Api-Key {settings.gpt_token}",
     identification=settings.gpt_identification,

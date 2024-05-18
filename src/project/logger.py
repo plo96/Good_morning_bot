@@ -21,12 +21,11 @@ class BotMessageHandler(logging.Handler):
 		try:
 			msg = self.format(record)
 			create_task(self.bot.send_message(settings.admin_id, msg))
-			# bot.send_message(settings.admin_id, record)		#TODO: Необходимо отсылать сообщения синхронно
 		except Exception:
 			self.handleError(record)
 
 
-def init_logger(name: str, bot: Bot) -> logging.Logger:
+def init_logger(name: str, bot: Bot) -> None:
 	"""
 	Инициализация и настройка логгера: задание уровней перехвата и форматов для всех хендлеров.
 	bm_handler - кастомный хендлер для отправки особо важных уведомлений в Telegram.
@@ -34,7 +33,7 @@ def init_logger(name: str, bot: Bot) -> logging.Logger:
 	rfh - хендлер для записи в серию файлов общих логов (обновляется при превышении размера файлов).
 	:param name: Имя логгера.
 	:param bot: Бот, с которого будут отправляться уведомления.
-	:return: Экземпляр настроенного логгера.
+	:return: None
 	"""
 	logger = logging.getLogger(name)
 	logger.setLevel(logging.DEBUG)
@@ -67,7 +66,3 @@ def init_logger(name: str, bot: Bot) -> logging.Logger:
 	logger.addHandler(rfh)
 	
 	logger.debug('logger was initialized.')
-
-	print(logger.handlers)
-
-	return logger

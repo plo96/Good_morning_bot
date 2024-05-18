@@ -9,11 +9,12 @@ from src.project.config import settings
 from src.core.schemas import WeatherDTO
 from src.project.exceptions import WeatherApiException
 from src.outer_apis_workers.multiply_triying import multiply_trying
+from .i_weather_worker import IWeatherWorker
 
 WEATHER_URL = "http://api.openweathermap.org/data/2.5/forecast"
 
 
-class WeatherWorker:
+class OpenweathermapWeatherWorker(IWeatherWorker):
     """Класс для обеспечения взаимодействия с API прогноза погоды."""
 
     def __init__(
@@ -89,7 +90,7 @@ class WeatherWorker:
         return weather_text
 
 
-weather_worker = WeatherWorker(
+openweathermap_weather_worker = OpenweathermapWeatherWorker(
     url=WEATHER_URL,
     token=settings.weather_token,
 )

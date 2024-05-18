@@ -7,12 +7,12 @@ from src.outer_apis_workers.multiply_triying import multiply_trying
 from src.project.config import settings
 from src.project.exceptions import GeopositionalApiException
 from src.core.schemas import CityDTO
-
+from .i_geoposition_worker import IGeopositionWorker
 
 GEOPOSITION_URL = "http://api.openweathermap.org/geo/1.0/direct"
 
 
-class GeopositionWorker:
+class OpenweathermapGeopositionWorker(IGeopositionWorker):
     """Класс для взаимодействия с API геопозиции."""
     def __init__(
             self,
@@ -47,15 +47,15 @@ class GeopositionWorker:
                 if status_code != 200:
                     raise GeopositionalApiException
                 response = await response.json()
-                list_of_cities: list = []
-                for result in response:
-                    city = CityDTO.from_dict(result)
-                    list_of_cities.append(city)
+        list_of_cities: list = []
+        for result in response:
+            city = CityDTO.from_dict(result)
+            list_of_cities.append(city)
                     
         return list_of_cities
 
 
-geoposition_worker = GeopositionWorker(
+openweathermap_geoposition_worker = OpenweathermapGeopositionWorker(
     url=GEOPOSITION_URL,
     token=settings.weather_token,
 )

@@ -1,24 +1,20 @@
 from logging import basicConfig, INFO
 import asyncio
 
-from src.project.logger import init_logger
 from src.telergam_bot import init_bot
-from src.scheduler import SchedulerHelper
-from src.events import starup_events, shutdown_events
+from src.events.shutdown_events import ShutdownEvents
+from src.events.startup_events import StartupEvents
 
 
 async def main():
 	basicConfig(level=INFO)
-	SchedulerHelper.start_scheduler()
 	bot, dp = await init_bot()
-	logger = init_logger(name='main', bot=bot)
+
 	try:
-		await starup_events.refresh_all_time_shift()
-		await starup_events.add_all_jobs_from_database(bot=bot)
-		logger.info('startup tasks done.')
+		await StartupEvents.do_all_startup_events(bot=bot)
 		await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 	finally:
-		await shutdown_events.del_all_jobs_from_database()
+		await ShutdownEvents.do_all_shutdown_events()
 		await bot.session.close()
 
 

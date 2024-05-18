@@ -1,12 +1,12 @@
-from aiogram import Router, F, Bot
-from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command, StateFilter
+from aiogram import Router, F
+from aiogram.types import CallbackQuery
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 from src.telergam_bot.utils import BotTexts, StepsForm
 from src.telergam_bot.keyboards import BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
-from src.scheduler import SchedulerHelper
+from src.scheduler import Scheduler
 
 router = Router()
 
@@ -42,7 +42,7 @@ async def delete_accept(
 	user_id = callback.from_user.id
 	user = await UserRepository.select_user(user_id=user_id)
 	await UserRepository.del_user(user_id=user_id)
-	SchedulerHelper.del_async_schedule_job(user=user)
+	Scheduler.delete_job_for_user(user=user)
 	await state.clear()
 	new_message = await callback.message.answer(
 		text=BotTexts.success_delete_text(),

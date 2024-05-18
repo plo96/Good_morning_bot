@@ -6,17 +6,19 @@ from abc import ABC
 from motor.motor_asyncio import AsyncIOMotorCollection
 
 from src.core.schemas import UserDTO
-from src.database.db_helper_mongo import db_helper
+from src.database.db_connector_mongo import DBConnector
+from src.project import settings
 
 
 class UserRepositoryMongo(ABC):
     """Репозиторий на основе mongodb для сущностей пользователей."""
+    _db_connector = DBConnector(settings.db_url_mongodb)
 
     @classmethod
     async def add_user(
             cls,
             new_user: UserDTO,
-            collection: AsyncIOMotorCollection = db_helper.get_collection_users(),
+            collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
     ) -> None:
         """
         Добавление одного пользователя.
@@ -30,7 +32,7 @@ class UserRepositoryMongo(ABC):
     async def update_user(
             cls,
             user_id: int,
-            collection: AsyncIOMotorCollection = db_helper.get_collection_users(),
+            collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
             **kwargs,
     ) -> None:
         """
@@ -46,7 +48,7 @@ class UserRepositoryMongo(ABC):
     async def select_user(
             cls,
             user_id: int,
-            collection: AsyncIOMotorCollection = db_helper.get_collection_users(),
+            collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
     ) -> UserDTO | None:
         """
         Выгрузка данных конкретного пользователя из базы.
@@ -63,7 +65,7 @@ class UserRepositoryMongo(ABC):
     @classmethod
     async def select_all_users(
             cls,
-            collection: AsyncIOMotorCollection = db_helper.get_collection_users(),
+            collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
     ) -> list[UserDTO]:
         """
         Выгрузка данных всех пользователей, записанных в базе.
@@ -76,7 +78,7 @@ class UserRepositoryMongo(ABC):
     @classmethod
     async def count_users(
             cls,
-            collection: AsyncIOMotorCollection = db_helper.get_collection_users(),
+            collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
     ) -> int:
         """
         Число пользователей, записанных в базе данных.
@@ -90,7 +92,7 @@ class UserRepositoryMongo(ABC):
     async def del_user(
             cls,
             user_id: int,
-            collection: AsyncIOMotorCollection = db_helper.get_collection_users(),
+            collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
     ) -> None:
         """
         Удаление данных конкретного пользователя из базы.
@@ -99,3 +101,7 @@ class UserRepositoryMongo(ABC):
         :return: None
         """
         await collection.delete_one({'_id': user_id})
+
+    @classmethod
+    def close_connection(cls):
+        cls._db_connector.close()

@@ -1,6 +1,6 @@
-from aiogram import Router, F, Bot
-from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command, StateFilter
+from aiogram import Router, Bot
+from aiogram.types import Message
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
@@ -19,13 +19,6 @@ async def start(
 			user_name=message.from_user.first_name,
 		),
 	)
-
-
-@router.message(Command("user_info"))			# TODO: delete this
-async def start(
-		message: Message,
-):
-	print(message.from_user)
 
 
 @router.message(Command("menu"))

@@ -2,8 +2,8 @@
 	Осуществление работ по расписанию.
 """
 __all__ = (
-	'SchedulerHelper',
+    'Scheduler',
 )
 
 
-from .scheduler import SchedulerHelper
+from .scheduler import Scheduler

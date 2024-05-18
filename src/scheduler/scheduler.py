@@ -3,22 +3,23 @@
 """
 from abc import ABC
 from logging import getLogger
-from datetime import datetime, timezone
+from datetime import datetime
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram import Bot
+from pytz import utc
 
 from src.core.schemas import UserDTO
 from src.scheduler.schedule_jobs import say_good_morning
 
 
-class SchedulerHelper(ABC):
+class Scheduler(ABC):
 	"""Абстрактный класс для управления задачами по расписанию"""
 	_logger = getLogger('main.scheduler')
-	_async_scheduler = AsyncIOScheduler(timezone=timezone.utc)
+	_async_scheduler = AsyncIOScheduler(timezone=utc)
 	
 	@classmethod
-	def add_new_async_schedule_job(
+	def add_new_good_morning_job(
 			cls,
 			bot: Bot,
 			user: UserDTO,
@@ -45,14 +46,14 @@ class SchedulerHelper(ABC):
 			trigger='cron',
 			hour=actual_wake_up_time.hour,
 			minute=actual_wake_up_time.minute,
-			start_date=datetime.now(),
+			start_date=datetime.now(utc),
 			kwargs={'bot': bot, 'user_id': user.id},
 		)
 		cls._logger.warning(f'new scheduler job for {user} added.')
 		return new_job.id
 	
 	@classmethod
-	def del_async_schedule_job(
+	def delete_job_for_user(
 			cls,
 			user: UserDTO,
 	) -> None:
@@ -63,10 +64,18 @@ class SchedulerHelper(ABC):
 		"""
 		cls._async_scheduler.remove_job(job_id=user.job_id)
 		cls._logger.warning(f'scheduler job for {user} removed.')
-		
 
-		
 	@classmethod
-	def start_scheduler(cls):
+	def start(cls):
 		"""Запуск обработки задач по расписанию."""
 		cls._async_scheduler.start()
+
+	@classmethod
+	def stop(cls):
+		"""Остановка обработки задач по расписанию."""
+		cls._async_scheduler.shutdown(wait=False)
+
+	@classmethod
+	def delete_all_jobs(cls):
+		"""Удаление всех активных задач по расписанию."""
+		cls._async_scheduler.remove_all_jobs()
