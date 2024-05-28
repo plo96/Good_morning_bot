@@ -2,8 +2,7 @@ from logging import basicConfig, INFO
 import asyncio
 
 from src.telergam_bot import init_bot
-from src.events.shutdown_events import ShutdownEvents
-from src.events.startup_events import StartupEvents
+from src.events import StartupEvents, ShutdownEvents
 
 
 async def main():

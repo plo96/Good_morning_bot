@@ -1,5 +1,5 @@
 """
-	Интерфейс для работы с задачами по расписанию.
+	Класс, предоставляющий интерфейс для работы с задачами по расписанию.
 """
 from abc import ABC
 from logging import getLogger
@@ -10,7 +10,7 @@ from aiogram import Bot
 from pytz import utc
 
 from src.core.schemas import UserDTO
-from src.scheduler.schedule_jobs import say_good_morning
+from src.scheduler.schedule_jobs import send_periodical_message
 
 
 class Scheduler(ABC):
@@ -41,7 +41,7 @@ class Scheduler(ABC):
 		
 		job_id = user.job_id
 		new_job = cls._async_scheduler.add_job(
-			say_good_morning,
+			send_periodical_message,
 			id=job_id,
 			trigger='cron',
 			hour=actual_wake_up_time.hour,
@@ -60,7 +60,6 @@ class Scheduler(ABC):
 		"""
 		Удаление из расписания задачи 'say_good_morning' для определённого пользователя.
 		:param user: Пользователь, для которого удаляется задача.
-		:return: None
 		"""
 		cls._async_scheduler.remove_job(job_id=user.job_id)
 		cls._logger.warning(f'scheduler job for {user} removed.')

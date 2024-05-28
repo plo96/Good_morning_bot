@@ -1,2 +1,5 @@
-from .i_shutdown_events import IShutdownEvents
+__all__ = (
+	"ShutdownEvents",
+)
+
 from .shutdown_events import ShutdownEvents

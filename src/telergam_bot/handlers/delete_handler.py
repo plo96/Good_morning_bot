@@ -1,10 +1,12 @@
+"""
+	Handlers для процесса удаления пользователя.
+"""
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from src.telergam_bot.utils import BotTexts, StepsForm
-from src.telergam_bot.keyboards import BotKeyboards
+from src.telergam_bot.utils import BotTexts, StepsForm, BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
 from src.scheduler import Scheduler
 

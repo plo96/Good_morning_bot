@@ -14,7 +14,7 @@ class DBConnector:
         self._client = AsyncIOMotorClient(url)
     
     def get_collection(self, collection_name: str) -> AsyncIOMotorCollection:
-        """Возвращение ссылки на указанную коллекцию для обращения с базой данных"""
+        """Возвращение ссылки на указанную коллекцию для обращения с базой данных."""
         return self._client["database"][collection_name]
 
     def close(self):

@@ -21,7 +21,7 @@ class CityDTO:
 		Получение экземпляра класса CityDTO из словаря, содержащего большее или равное данному классу число полей.
 		Валидация данных в процессе.
 		:param input_dict: Словарь с данными модели.
-		:return: CityDTO
+		:return: Экземпляр класса CityDTO.
 		"""
 		valid_dict: dict = {}
 		for attr, needed_type in cls.__annotations__.items():

@@ -1,3 +1,6 @@
+"""
+	Middleware классы для работы бота.
+"""
 __all__ = (
 	"ClearPreviousKeyboard",
 	"LoggingUserDeal",

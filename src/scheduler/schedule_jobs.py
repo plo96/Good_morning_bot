@@ -8,7 +8,7 @@ from src.outer_apis_workers.weather_worker import weather_worker
 from src.outer_apis_workers.gpt_worker import gpt_worker
 
 
-async def say_good_morning(
+async def send_periodical_message(
         bot: Bot,
         user_id: int,
 ) -> None:
@@ -16,7 +16,6 @@ async def say_good_morning(
     Получение пожелания доброго утра и прогноза погоды от внешних API и их отправка пользователю.
     :param bot: Telegram бот с которого будут отправлятсья сообщения.
     :param user_id: id пользователя, которому отправляется сообщение.
-    :return: None
     """
     
     user = await UserRepository.select_user(user_id=user_id)

@@ -23,10 +23,10 @@ class UserDTO:
     job_id: Optional[str] = None    # id привязанной хадачи по расписанию
     
     
-    def to_serialised_mongo_dict(self) -> dict:
+    def to_mongo_dict(self) -> dict:
         """
-        Сериализация данных и представление их в словаре для записи в базу данных mongodb.
-        :return: dict
+        Представление данных в валидном словаре для записи в базу данных mongodb.
+        :return: Словарь с данными экземпляра схемы UserDTO.
         """
         return dict(
             _id=self.id,
@@ -39,11 +39,11 @@ class UserDTO:
         )
     
     @staticmethod
-    def from_serialised_mongo_dict(mongo_dict: dict | Mapping[str, Any]):
+    def from_mongo_dict(mongo_dict: dict | Mapping[str, Any]):
         """
-        Создание экземпляра класса UserDTO из сериализованного словаря после чтения из базы данных mongodb.
+        Создание экземпляра класса UserDTO из словаря, полученного после чтения из базы данных mongodb.
         :param mongo_dict: Словарь, полученный из базы данных mongodb.
-        :return: UserDTO
+        :return: Экземпляр схемы UserDTO.
         """
         return UserDTO(
             id=mongo_dict.__getitem__('_id'),
@@ -54,3 +54,4 @@ class UserDTO:
             time_shift=timedelta(seconds=mongo_dict.__getitem__('time_shift')),
             job_id=mongo_dict.__getitem__('job_id'),
         )
+    

@@ -1,10 +1,13 @@
+"""
+    Реализация класса, выполняющего задачи при запуске приложения.
+"""
 from src.scheduler import Scheduler
 from aiogram import Bot
 
 from src.outer_apis_workers.timezone_worker import timezone_worker, ITimezoneWorker
 from src.database import UserRepositoryMongo as UserRepository
-from .i_startup_events import IStartupEvents
-from ...project.logger import init_logger
+from src.events.startup_events.i_startup_events import IStartupEvents
+from src.project.logger import init_logger
 
 
 class StartupEvents(IStartupEvents):
@@ -27,8 +30,7 @@ class StartupEvents(IStartupEvents):
     ) -> None:
         """
 		Добавление в расписание задач для всех пользователей из базы данных. Обновление данных по job_id в базе.
-		:param bot: Telegram бот, с которого будут отсылаться уведомления.
-		:return: None
+		:param bot: Telegram бот, с которого будут отсылаться уведомления (Экземпляр класса Bot библиотеки aiogram).
 		"""
         users = await UserRepository.select_all_users()
         for user in users:
@@ -42,9 +44,7 @@ class StartupEvents(IStartupEvents):
     @classmethod
     async def _refresh_all_time_shift(cls) -> None:
         """
-		Обновление всех данных по сдвигу времени для всех пользователей
-		(чтобы перезапуском бота можно было учитывать летнее время).
-		:return: None
+		Обновление данных в БД по текущему сдвигу времени для всех пользователей (для учёта зимнего времени).
 		"""
         users = await UserRepository.select_all_users()
         for user in users:

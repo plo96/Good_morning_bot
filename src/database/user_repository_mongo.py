@@ -24,9 +24,8 @@ class UserRepositoryMongo(ABC):
         Добавление одного пользователя.
         :param new_user: Новый пользователь класса UserDTO для добавления в БД.
         :param collection: Доступ к коллекции users через асинхронный клиент доступа к БД.
-        :return: None
         """
-        await collection.insert_one(new_user.to_serialised_mongo_dict())
+        await collection.insert_one(new_user.to_mongo_dict())
 
     @classmethod
     async def update_user(
@@ -40,7 +39,6 @@ class UserRepositoryMongo(ABC):
         :param user_id: Параметр '_id' изменяемого пользователя.
         :param collection: Доступ к коллекции users через асинхронный клиент доступа к БД.
         :param kwargs: Перечисление изменяемых параметров и их новых значений.
-        :return: None
         """
         await collection.update_one({'_id': user_id}, {"$set": kwargs})
 
@@ -54,12 +52,12 @@ class UserRepositoryMongo(ABC):
         Выгрузка данных конкретного пользователя из базы.
         :param user_id: Параметр '_id' нужного пользователя.
         :param collection: Доступ к коллекции users через асинхронный клиент доступа к БД.
-        :return: UserDTO или None если пользователь не найден в базе данных.
+        :return: Экземпляр класса UserDTO или None если пользователь не найден в базе данных.
         """
         result = await collection.find_one({'_id': user_id})
         if not result:
             return
-        user = UserDTO.from_serialised_mongo_dict(result)
+        user = UserDTO.from_mongo_dict(result)
         return user
 
     @classmethod
@@ -70,9 +68,9 @@ class UserRepositoryMongo(ABC):
         """
         Выгрузка данных всех пользователей, записанных в базе.
         :param collection: Доступ к коллекции users через асинхронный клиент доступа к БД.
-        :return: list[UserDTO]
+        :return: Список экземпляров класса UserDTO.
         """
-        users = [UserDTO.from_serialised_mongo_dict(user) async for user in collection.find({})]
+        users = [UserDTO.from_mongo_dict(user) async for user in collection.find({})]
         return users
 
     @classmethod
@@ -81,9 +79,9 @@ class UserRepositoryMongo(ABC):
             collection: AsyncIOMotorCollection = _db_connector.get_collection('users'),
     ) -> int:
         """
-        Число пользователей, записанных в базе данных.
+        Вывод числа пользователей, записанных в базе данных.
         :param collection: Доступ к коллекции users через асинхронный клиент доступа к БД.
-        :return: int
+        :return: Число записей пользователей (int).
         """
         result = await collection.count_documents({})
         return result
@@ -98,7 +96,6 @@ class UserRepositoryMongo(ABC):
         Удаление данных конкретного пользователя из базы.
         :param user_id: Параметр '_id' нужного пользователя.
         :param collection: Доступ к коллекции users через асинхронный клиент доступа к БД.
-        :return: None
         """
         await collection.delete_one({'_id': user_id})
 

@@ -57,5 +57,5 @@ class OpenweathermapGeopositionWorker(IGeopositionWorker):
 
 openweathermap_geoposition_worker = OpenweathermapGeopositionWorker(
     url=GEOPOSITION_URL,
-    token=settings.weather_token,
+    token=settings.geopositional_token,
 )

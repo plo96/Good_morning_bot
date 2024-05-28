@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram.fsm.storage.redis import RedisStorage
 
-from src.project.config import settings
+from src.project import settings
 from src.telergam_bot.handlers import router
 from src.telergam_bot.middlewares import ClearPreviousKeyboard, LoggingUserDeal
 

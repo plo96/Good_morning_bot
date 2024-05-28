@@ -1,3 +1,6 @@
+"""
+	Класс, хранящий все речевые ответы бота.
+"""
 from abc import ABC
 from datetime import time
 

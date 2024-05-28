@@ -12,7 +12,7 @@ async def add_users_to_database(
 		num_of_users: int,
 ) -> None:
 	for _ in range(num_of_users):
-		await collection.insert_one(get_new_user().to_serialised_mongo_dict())
+		await collection.insert_one(get_new_user().to_mongo_dict())
 
 
 @pytest.fixture
@@ -39,5 +39,5 @@ async def users_in_database(
 ) -> list[UserDTO]:
 	users_in_database: list = []
 	async for user in fake_collection_users.find({}):
-		users_in_database.append(UserDTO.from_serialised_mongo_dict(user))
+		users_in_database.append(UserDTO.from_mongo_dict(user))
 	return users_in_database

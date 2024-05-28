@@ -1,2 +1,5 @@
-from .i_startup_events import IStartupEvents
+__all__ = (
+	"StartupEvents",
+)
+
 from .startup_events import StartupEvents

@@ -1,3 +1,6 @@
+"""
+	Handlers для процесса настройки пользователя.
+"""
 from datetime import time
 
 from aiogram import Router, F, Bot
@@ -6,8 +9,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 from src.core.schemas import CityDTO, UserDTO
-from src.telergam_bot.utils import BotTexts, StepsForm
-from src.telergam_bot.keyboards import BotKeyboards
+from src.telergam_bot.utils import BotTexts, StepsForm, BotKeyboards
 from src.database.user_repository_mongo import UserRepositoryMongo as UserRepository
 from src.outer_apis_workers.geoposition_worker import geoposition_worker
 from src.outer_apis_workers.timezone_worker import timezone_worker

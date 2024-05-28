@@ -4,12 +4,9 @@
 from dataclasses import dataclass
 import os
 from pathlib import Path
+from typing import Optional
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-HOME_DIR = Path(__file__).parent.parent.parent.absolute()
+HOME_DIR = Path(__file__).parent.parent.parent
 
 
 @dataclass
@@ -17,10 +14,11 @@ class Settings:
 	"""Класс, содержащий основные настройки приложения."""
 	bot_token: str
 	weather_token: str
+	geopositional_token: str
 	gpt_token: str
 	gpt_identification: str
 	home_dir: Path
-	admin_id: int
+	admin_id: Optional[int]
 	max_number_of_users: int
 
 	_mongo_user: str
@@ -43,10 +41,11 @@ class Settings:
 settings = Settings(
 	bot_token=os.getenv("BOT_TOKEN"),
 	weather_token=os.getenv("OPENWEATHERMAP_API_KEY"),
+	geopositional_token=os.getenv("GEOPOSITIONAL_OPENWEATHERMAP_API_KEY"),
 	gpt_identification=os.getenv("YANDEX_GPT_IDENTIFICATION"),
 	gpt_token=os.getenv("YANDEX_GPT_API_KEY"),
 	home_dir=HOME_DIR,
-	admin_id=int(os.getenv('ADMIN_ID')),
+	admin_id=int(os.getenv('ADMIN_ID')) if os.getenv('ADMIN_ID') else None,
 	max_number_of_users=int(os.getenv('MAX_NUMBER_OF_USERS')),
 	_mongo_user=os.getenv("MONGO_USER"),
 	_mongo_pwd=os.getenv("MONGO_PWD"),

@@ -40,9 +40,10 @@ def init_logger(name: str, bot: Bot) -> None:
 	FORMAT = '[%(levelname)s]_(%(asctime)s)_%(name)s:%(lineno)s - %(message)s'
 	DATEFMT = '%d/%m/%Y %I:%M:%S'
 	
-	bm_handler = BotMessageHandler(bot=bot)
-	bm_handler.setLevel(logging.WARNING)
-	logger.addHandler(bm_handler)
+	if settings.admin_id:
+		bm_handler = BotMessageHandler(bot=bot)
+		bm_handler.setLevel(logging.WARNING)
+		logger.addHandler(bm_handler)
 	
 	if "logs" not in os.listdir(settings.home_dir):
 		os.chdir(settings.home_dir)

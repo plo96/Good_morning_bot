@@ -24,7 +24,7 @@ async def test_user_repository_add_user(
 	users_in_database = [user async for user in fake_collection_users.find({'_id': new_user.id})]
 	assert len(users_in_database) == 1
 	user_in_database = users_in_database[0]
-	assert UserDTO.from_serialised_mongo_dict(user_in_database) == new_user
+	assert UserDTO.from_mongo_dict(user_in_database) == new_user
 
 
 @pytest.mark.parametrize("param", list(UserDTO.__dict__.keys()))	# TODO: попробовать без 'list'
@@ -42,7 +42,7 @@ async def test_user_repository_update_user(
 		collection=fake_collection_users,
 		**param_to_change,
 	)
-	changed_user = UserDTO.from_serialised_mongo_dict(await fake_collection_users.find_one({'_id': user.id}))
+	changed_user = UserDTO.from_mongo_dict(await fake_collection_users.find_one({'_id': user.id}))
 	for attr in UserDTO.__dict__.keys():
 		if attr == param:
 			assert changed_user.__getattribute__(attr) == new_user.__getattribute__(attr)

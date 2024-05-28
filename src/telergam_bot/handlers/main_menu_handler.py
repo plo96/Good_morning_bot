@@ -1,11 +1,13 @@
+"""
+	Handlers для главного меню.
+"""
 from aiogram import Router, Bot
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
-from src.telergam_bot.utils import BotTexts
-from src.telergam_bot.keyboards import BotKeyboards
+from src.telergam_bot.utils import BotTexts, BotKeyboards
 
 router = Router()
 

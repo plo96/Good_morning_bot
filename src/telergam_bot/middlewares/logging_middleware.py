@@ -7,6 +7,9 @@ from aiogram.types import TelegramObject
 
 
 class LoggingUserDeal(BaseMiddleware):
+	"""
+	Middleware для логирования всех событий в боте.
+	"""
 	def __init__(self, logger: Logger = getLogger('main.middleware_logger')):
 		self.logger = logger
 	

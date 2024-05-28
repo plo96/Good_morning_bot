@@ -1,8 +1,10 @@
+from abc import ABC
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-class BotKeyboards:
+class BotKeyboards(ABC):
 
     @staticmethod
     def get_menu_kb():
