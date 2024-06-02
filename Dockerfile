@@ -13,4 +13,4 @@ COPY src src
 
 COPY main.py main.py
 
-CMD ["python3", "main.py"]
+# CMD ["python3", "main.py"]

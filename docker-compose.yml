@@ -11,23 +11,26 @@ services:
       - my_redis
     volumes:
           - ./logs:/app/logs
+    command: bash -c 'while !</dev/tcp/my_mongo/27017; do sleep 1; done; python3 main.py'
     env_file:
       - ./.env
   my_mongo:
     container_name: my_mongo
     image: mongo:latest
+    hostname: my_mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PWD}
+    volumes:
+      - ./mongodb_data:/data/db
     ports:
       - "27017:27017"
   my_redis:
     container_name: my_redis
     image: redis:latest
-#    command: redis-server --requirepass 'admin'
-    environment:
-#      - MONGO_INITDB_ROOT_PASSWORD=${REDIS_PWD}
+    hostname: my_redis
+    command: ["redis-server", "--requirepass", "${REDIS_PWD}"]
     volumes:
-#      - ./mongodb_data:/var/lib/mongo/data
+      - ./redis_data:/data
     ports:
       - "6379:6379"

@@ -4,3 +4,6 @@ venv
 .idea
 /dist
 __pycache__
+logs/
+mongodb_data/
+redis_data/

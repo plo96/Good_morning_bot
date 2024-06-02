@@ -30,22 +30,22 @@
 
 ## Запуск и настройка
 1) Получить все необходимые ключи внешних API для работы приложения:
-   - YOUR_BOT_TOKEN: написать телеграм-боту Bot_Father, выбрать комманду '/create_bot' и следовать инструкциям.
-   - YOUR_WEATHER_API_KEY: зарегистрироваться на сайте openweathermap.com и выбрать раздел ...
-   - YOUR_GEOPOSITIONAL_API_KEY: в штатной вариации - такой же ключ 'YOUR_WEATHER_API_KEY'.
-   - YOUR_YANDEX_IDENTIFICATON: зарегистрироваться на сайте yandex-cloud.ru и выбрать раздел ...
-   - YANDEX_GPT_API_KEY: зарегистрироваться на сайте yandex-cloud.com.ru и выбрать раздел ...
+   - YOUR_BOT_TOKEN: написать телеграм-боту Bot_Father, выбрать комманду '/newbot' и следовать инструкциям.
+   - YOUR_WEATHER_API_KEY: на сайте openweathermap.org выбрать раздел API, выбрать подходящий тариф и следовать инструкциям.
+   - YOUR_GEOPOSITIONAL_API_KEY: в штатной вариации - такой же ключ 'YOUR_WEATHER_API_KEY', полученный в предыдущем пункте.
+   - YOUR_YANDEX_IDENTIFICATON: зарегистрироваться на сайте yandex.cloud и перейти в раздел "Консоль". Создать новый каталог или использовать default. Идентификатор каталога и есть данный ключ.
+   - YANDEX_GPT_API_KEY: в каталоге, который был выбран в предыдущем пункте, создать сервисный аккаунт с доступом к YandexGPT следуя инструкциям на сайте. Идентификатор аккаунта и есть данный ключ.
 2) Создать в корне приложения .env по образцу и внести в него полученные в п.1 ключи (при необходимости изменить кофигурации MongoDB и Redis, добавить телеграм-id администратора и раскомментировать строку с 'ADMIN_ID'):
     ```plaintext
         # MongoDB configs
-        MONGO_HOST=localhost  
+        MONGO_HOST=my_mongo  
         MONGO_PORT=27017
         MONGO_USER=admin
         MONGO_PWD=admin
   
         # Redis-server configs
         REDIS_PWD=admin
-        REDIS_HOST=localhost
+        REDIS_HOST=my_redis
         REDIS_PORT=6379
         
         # Telegram configs

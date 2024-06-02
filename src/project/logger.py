@@ -49,15 +49,14 @@ def init_logger(name: str, bot: Bot) -> None:
 		os.chdir(settings.home_dir)
 		os.mkdir("logs")
 		os.chdir(os.path.dirname(os.path.abspath(__file__)))
-		print(os.curdir)
-	
-	fh = logging.FileHandler(filename=f"{settings.home_dir}\\logs\\current_logs.log", mode='w')
+
+	fh = logging.FileHandler(filename=f"{settings.home_dir}/logs/current_logs.log", mode='w')
 	fh.setFormatter(logging.Formatter(fmt=FORMAT, datefmt=DATEFMT))
 	fh.setLevel(logging.DEBUG)
 	logger.addHandler(fh)
 	
 	rfh = RotatingFileHandler(
-		filename=f"{settings.home_dir}\\logs\\logs.log",
+		filename=f"{settings.home_dir}/logs/logs.log",
 		mode='a',
 		maxBytes=5 * 1024 * 1024,
 		backupCount=5
@@ -66,4 +65,4 @@ def init_logger(name: str, bot: Bot) -> None:
 	rfh.setLevel(logging.INFO)
 	logger.addHandler(rfh)
 	
-	logger.debug('logger was initialized.')
+	logger.info('logger was initialized.')

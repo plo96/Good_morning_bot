@@ -8,7 +8,6 @@ from typing import Optional
 
 HOME_DIR = Path(__file__).parent.parent.parent
 
-
 @dataclass
 class Settings:
 	"""Класс, содержащий основные настройки приложения."""
